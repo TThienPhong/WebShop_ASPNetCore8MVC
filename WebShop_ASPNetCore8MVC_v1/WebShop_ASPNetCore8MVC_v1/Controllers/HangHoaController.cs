@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebShop_ASPNetCore8MVC_v1.Data;
+using WebShop_ASPNetCore8MVC_v1.ViewModels;
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
@@ -14,7 +15,24 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         
         public IActionResult Index(int? loai)
         {
-            return View();
+            var hangHoas = db.HangHoas.AsQueryable();
+
+            if (loai.HasValue)
+            {
+                hangHoas = hangHoas.Where(p => p.MaLoai == loai.Value);
+            }
+
+            var result = hangHoas.Select(p => new HangHoaVM
+            {
+                MaHH = p.MaHh,
+                TenHH = p.TenHh,
+                DonGia = p.DonGia ?? 0,
+                Hinh = p.Hinh ?? "",
+                MoTaNgan = p.MoTaDonVi ?? "",
+                TenLoai = p.MaLoaiNavigation.TenLoai
+            });
+            return View(result);
+           
         }
     }
 }
