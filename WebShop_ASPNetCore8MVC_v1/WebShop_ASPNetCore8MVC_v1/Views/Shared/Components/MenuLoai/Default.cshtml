@@ -7,7 +7,7 @@
             {
                 <li>
                     <div class="d-flex justify-content-between fruite-name">
-                        <a asp-controller="HangHoa" asp-action="Index" >
+                        <a asp-controller="HangHoa" asp-action="Index" asp-route-loai="@loaiVM.MaLoai">
                             <i class="fas fa-apple-alt me-2"></i>
                             @loaiVM.TenLoai
                         </a>
