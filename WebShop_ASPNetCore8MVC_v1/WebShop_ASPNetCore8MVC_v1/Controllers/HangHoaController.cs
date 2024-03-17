@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
 
@@ -33,6 +34,26 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             });
             return View(result);
            
+        }
+        public IActionResult Search (string? query)
+        {
+            var hangHoas = db.HangHoas.AsQueryable();
+
+            if (!String.IsNullOrEmpty(query) )
+            {
+                hangHoas = hangHoas.Where(p => p.TenHh.Contains(query));
+            }
+
+            var result = hangHoas.Select(p => new HangHoaVM
+            {
+                MaHH = p.MaHh,
+                TenHH = p.TenHh,
+                DonGia = p.DonGia ?? 0,
+                Hinh = p.Hinh ?? "",
+                MoTaNgan = p.MoTaDonVi ?? "",
+                TenLoai = p.MaLoaiNavigation.TenLoai
+            });
+            return View(result);
         }
     }
 }
