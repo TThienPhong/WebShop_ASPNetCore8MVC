@@ -55,6 +55,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
         }
 
+
         public IActionResult RemoveCartItem(int id)
         {
             var gioHang = Cart;
@@ -65,6 +66,23 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 HttpContext.Session.Set(CART_KEY, gioHang);
             }
             return RedirectToAction("Index");
+        }
+
+        public IActionResult UpdateQuantity(int id, int quantity = 1)
+        {
+            var gioHang = Cart;
+            var item = gioHang.SingleOrDefault(p => p.MaHh == id);
+            if (item != null)
+            {
+                item.SoLuong = quantity;
+                
+            }
+           
+
+            HttpContext.Session.Set(CART_KEY, gioHang);
+
+            return RedirectToAction("Index");
+
         }
 
     }

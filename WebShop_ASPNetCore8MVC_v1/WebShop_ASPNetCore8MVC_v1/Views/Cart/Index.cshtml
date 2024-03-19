@@ -34,28 +34,39 @@
                         <tr>
                             <th scope="row">
                                 <div class="d-flex align-items-center">
-                                    <img src="Hinh/HangHoa/@item.Hinh" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="@item.TenHH">
+                                    <a asp-controller="HangHoa" asp-action="Detail" asp-route-id="@item.MaHh">
+                                        <img src="Hinh/HangHoa/@item.Hinh" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="@item.TenHH">
+                                    </a>
+                                    
                                 </div>
                             </th>
                             <td>
-                                <p class="mb-0 mt-4">@item.TenHH</p>
+                                <a asp-controller="HangHoa" asp-action="Detail" asp-route-id="@item.MaHh">
+                                    <p class="mb-0 mt-4">@item.TenHH</p>
+                                </a>
+                                
                             </td>
                             <td>
                                 <p class="mb-0 mt-4">@item.DonGia</p>
                             </td>
                             <td>
                                 <div class="input-group quantity mt-4" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                            <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm text-center border-0" value="@item.SoLuong">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
+                                    <form class="input-group quantity" asp-controller="Cart" asp-action="UpdateQuantity" asp-route-id="@item.MaHh">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm text-center border-0" value="@item.SoLuong" name="quantity">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    
+                                    </form>
+
+                                    
                                 </div>
                             </td>
                             <td>
@@ -68,6 +79,10 @@
                             </td>
 
                         </tr>
+
+                      
+
+                       
                     }
 
                    
@@ -107,3 +122,7 @@
     </div>
 </div>
 <!-- Cart Page End -->
+
+
+
+
