@@ -74,13 +74,13 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             var item = gioHang.SingleOrDefault(p => p.MaHh == id);
             if (item != null)
             {
-                item.SoLuong = quantity;
-                
-            }
-           
+                if (quantity > 0)
+                {
+                    item.SoLuong = quantity;
+                }
 
-            HttpContext.Session.Set(CART_KEY, gioHang);
-
+                HttpContext.Session.Set(CART_KEY, gioHang);
+            }   
             return RedirectToAction("Index");
 
         }
