@@ -40,6 +40,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             return View(result);
            
         }
+        
         public IActionResult Search (string? query)
         {
             var hangHoas = db.HangHoas.AsQueryable();
@@ -60,6 +61,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             });
             return View(result);
         }
+        [HttpGet]
         public IActionResult Detail(int id)
         {
             var data = db.HangHoas

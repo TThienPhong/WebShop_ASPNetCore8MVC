@@ -54,6 +54,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
         }
 
+        
 
         public IActionResult RemoveCartItem(int id)
         {
@@ -67,6 +68,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
         public IActionResult UpdateQuantity(int id, int quantity = 1)
         {
             var gioHang = Cart;
