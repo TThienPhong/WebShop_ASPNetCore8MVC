@@ -1,0 +1,14 @@
+﻿@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+
+<h1>Profile</h1>
+<div class="container">
+	<h2>Welcome @Context.User.Identity.Name</h2>
+	<p> Tên Đăng Nhập:	@Context.User.FindFirstValue("CustomerID")</p>
+	<p> Email:			@Context.User.FindFirstValue(ClaimTypes.Email);</p>
+	<a asp-action="DangXuat">Đăng xuất</a>
+</div>
