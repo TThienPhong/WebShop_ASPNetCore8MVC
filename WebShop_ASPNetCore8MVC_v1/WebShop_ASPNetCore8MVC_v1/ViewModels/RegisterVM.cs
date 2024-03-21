@@ -31,12 +31,12 @@ namespace WebShop_ASPNetCore8MVC_v1.ViewModels
 
         [Display(Name = "Địa chỉ")]
         [MaxLength(60, ErrorMessage = "Tối đa 60 kí tự")]
-        public string DiaChi { get; set; }
+        public string? DiaChi { get; set; }
 
         [Display(Name = "Điện thoại")]
         [MaxLength(24, ErrorMessage = "Tối đa 24 kí tự")]
         [RegularExpression(@"0[9875]\d{8}", ErrorMessage = "Chưa đúng định dạng di động Việt Nam")]
-        public string DienThoai { get; set; }
+        public string? DienThoai { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập Email")]
         [EmailAddress(ErrorMessage = "Chưa đúng định dạng email")]

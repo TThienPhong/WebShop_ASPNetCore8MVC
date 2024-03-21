@@ -32,7 +32,22 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
 			if (ModelState.IsValid)
 			{
-				try
+                var existingUser = db.KhachHangs.FirstOrDefault(kh => kh.MaKh == model.MaKh || kh.Email == model.Email);
+				if (existingUser != null)
+				{
+                    // Nếu tài khoản đã tồn tại, hiển thị thông báo lỗi và trả về lại view đăng ký
+                    // Nếu tài khoản đã tồn tại, hiển thị thông báo lỗi và trả về lại view đăng ký
+                    if (existingUser.MaKh == model.MaKh)
+                    {
+                        ModelState.AddModelError(nameof(model.MaKh), "Tên đăng nhập đã được sử dụng. Vui lòng chọn một tên khác.");
+                    }
+                    if (existingUser.Email == model.Email)
+                    {
+                        ModelState.AddModelError(nameof(model.Email), "Địa chỉ email đã được sử dụng. Vui lòng chọn một địa chỉ email khác.");
+                    }
+                    return View(model);
+                }
+                try
 				{
 					var khachHang = _mapper.Map<KhachHang>(model);
 					khachHang.RandomKey = MyUtil.GenerateRamdomKey();
@@ -42,7 +57,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
 					if (Hinh != null)
 					{
-						khachHang.Hinh = MyUtil.UploadHinh(Hinh, "KhachHang");
+                        
+						khachHang.MaKh.ToString();
+                        khachHang.Hinh = MyUtil.UploadHinh(Hinh, "KhachHang");
 					}
 
 					db.Add(khachHang);
