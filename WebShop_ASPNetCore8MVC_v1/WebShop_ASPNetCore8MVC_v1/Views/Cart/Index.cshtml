@@ -51,7 +51,7 @@
                             </td>
                             <td>
                                 <div class="input-group quantity mt-4" style="width: 100px;">
-                                    <form class="input-group quantity" asp-controller="Cart" asp-action="UpdateQuantity" asp-route-id="@item.MaHh" method="get">
+                                   @*  <form class="input-group quantity" asp-controller="Cart" asp-action="UpdateQuantity" asp-route-id="@item.MaHh" method="get">
                                         <div class="input-group-btn">
                                             <button class="btn btn-sm btn-minus rounded-circle bg-light border">
                                                 <i class="fa fa-minus"></i>
@@ -64,8 +64,8 @@
                                             </button>
                                         </div>
                                     
-                                    </form>
-                                   @*  <div class="input-group-btn">
+                                    </form> *@
+                                    <div class="input-group-btn">
                                         <button class="btn btn-sm btn-minus rounded-circle bg-light border">
                                             <i class="fa fa-minus"></i>
                                         </button>
@@ -75,7 +75,7 @@
                                         <button class="btn btn-sm btn-plus rounded-circle bg-light border">
                                             <i class="fa fa-plus"></i>
                                         </button>
-                                    </div> *@
+                                    </div>
 
                                     
                                 </div>
@@ -133,27 +133,33 @@
     </div>
 </div>
 <!-- Cart Page End -->
-@* @section Scripts{
+@section Scripts{
     console.log("Gia trị cart");
-    $(".quantity-input").on("change", function () {
-                var id = $(this).data("item-id");
-                var quantity = $(this).val();
-               
+    $('.quantity-input').change(function() {
+        var quantity = $(this).val();
+        var id = $(this).data('item-id');
+        console.log("Gia trị cart quantity",quantity);
+        console.log("Gia trị cart id",id);
+            let url = `/Cart/UpdateQuantity?id=` + id+`&quantity=`+quantity;
+        window.location.href = url;
 
-                $.ajax({
-                    url: "/Cart/UpdateQuantity?id=" + id + "&quantity=" + quantity, // Đường dẫn đến controller và action với query string
-                    type: "GET", // Phương thức HTTP
-                    success: function (response) {
-                        // Xử lý phản hồi từ server nếu cần
-                    },
-                    error: function (xhr, status, error) {
-                            // Xử lý lỗi nếu có
-                            }
-                        });
-                console.log("Gia trị id",id);console.log("Gia trị quantity",quantity);
-
-            });
+       @*  // Gửi dữ liệu đến controller
+        $.ajax({
+            url: '/Cart/UpdateQuantity', // Thay đổi đường dẫn đến controller và action tương ứng
+            type: 'POST',
+            data: { id: id, quantity: quantity },
+            success: function(response) {
+                // Xử lý phản hồi từ controller nếu cần
+                consolo.log("ajax");
+            },
+            error: function(xhr, status, error) {
+                // Xử lý lỗi nếu có
+                console.error(xhr.responseText);
+            }
+            
+        }); *@
+    });
 }
 
- *@  
+  
 @*  không chay được *@
