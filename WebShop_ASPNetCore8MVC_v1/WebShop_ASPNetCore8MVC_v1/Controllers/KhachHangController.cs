@@ -31,7 +31,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         }
 
         [HttpPost]
-        public IActionResult DangKy(RegisterVM model, IFormFile Hinh)
+        public IActionResult DangKy(RegisterVM model, IFormFile? Hinh=null)
         {
 
             if (ModelState.IsValid)
@@ -123,7 +123,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
 							var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 							var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
+							await HttpContext.SignOutAsync();
 							await HttpContext.SignInAsync(claimsPrincipal);
 
 							if (Url.IsLocalUrl(ReturnUrl))

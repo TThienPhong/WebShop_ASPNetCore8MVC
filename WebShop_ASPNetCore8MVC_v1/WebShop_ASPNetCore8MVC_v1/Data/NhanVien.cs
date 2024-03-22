@@ -13,6 +13,8 @@ public partial class NhanVien
 
     public string? MatKhau { get; set; }
 
+    public string? RandomKey { get; set; }
+
     public virtual ICollection<ChuDe> ChuDes { get; set; } = new List<ChuDe>();
 
     public virtual ICollection<HoaDon> HoaDons { get; set; } = new List<HoaDon>();

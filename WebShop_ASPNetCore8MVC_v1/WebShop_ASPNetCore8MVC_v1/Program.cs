@@ -21,13 +21,38 @@ builder.Services.AddSession(options =>
 
 //https://docs.automapper.org/en/stable/Dependency-injection.html
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+
+
 // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-8.0
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+/*builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/KhachHang/DangNhap";
         options.AccessDeniedPath = "/AccessDenied";
-    });
+    })
+    .AddCookie("AdminCookieAuthenticationScheme", options =>
+     {
+	     options.LoginPath = "/Admin/DangNhap";
+	     options.AccessDeniedPath = "/Admin/AccessDenied"; // ???ng d?n t? ch?i truy c?p cho admin
+     });*/
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+	 .AddCookie(options =>
+	 {
+		 options.LoginPath = "/KhachHang/DangNhap";
+		 options.AccessDeniedPath = "/AccessDenied";
+	 })
+	.AddCookie("AdminCookieAuthenticationScheme", options =>
+	{
+		options.LoginPath = "/Admin/DangNhap";
+		options.AccessDeniedPath = "/Admin/AccessDenied"; // ???ng d?n t? ch?i truy c?p cho admin
+	});
+
 
 
 
