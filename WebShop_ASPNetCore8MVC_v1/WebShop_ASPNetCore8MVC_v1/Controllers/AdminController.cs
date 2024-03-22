@@ -45,7 +45,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 				var admin = db.NhanViens.SingleOrDefault(am => am.MaNv == model.UserName);
 				if (admin == null)
 				{
-					ModelState.AddModelError("loi", "Không có Admin nay này");
+					ModelState.AddModelError("loi", "Không có Admin này");
 				}
 				else
 				{
@@ -66,7 +66,10 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
 						var claimsIdentity = new ClaimsIdentity(claims, "AdminCookieAuthenticationScheme");
 						var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+						//Đăng xuất tất cả các phiên đăng nhập
 						await HttpContext.SignOutAsync();
+						await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
+						
 						await HttpContext.SignInAsync(claimsPrincipal);
 
 						if (Url.IsLocalUrl(ReturnUrl))

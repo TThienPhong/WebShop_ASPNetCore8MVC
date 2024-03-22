@@ -124,6 +124,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 							var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 							var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 							await HttpContext.SignOutAsync();
+							await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
 							await HttpContext.SignInAsync(claimsPrincipal);
 
 							if (Url.IsLocalUrl(ReturnUrl))
