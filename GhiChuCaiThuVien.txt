@@ -238,3 +238,89 @@ public async Task<IActionResult> DangNhap(LoginVM model,string? ReturnUrl)
 
 	await HttpContext.SignInAsync(claimsPrincipal);
 	....}
+
+
+
+---------------------Phân quyền
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+	 .AddCookie(options =>
+	 {
+		 options.LoginPath = "/KhachHang/DangNhap";
+		 options.AccessDeniedPath = "/AccessDenied";
+	 })
+	.AddCookie("AdminCookieAuthenticationScheme", options =>
+	{
+		options.LoginPath = "/Admin/DangNhap";
+		options.AccessDeniedPath = "/Admin/AccessDenied"; // ???ng d?n t? ch?i truy c?p cho admin
+	});
+
+
+
+***Khách hàng đăng nhap:
+
+
+......
+var claims = new List<Claim> {
+				new Claim(ClaimTypes.Email, khachHang.Email),
+				new Claim(ClaimTypes.Name, khachHang.HoTen),
+				new Claim("CustomerID", khachHang.MaKh),
+
+				//claim - role động
+				new Claim(ClaimTypes.Role, "Customer")
+};
+var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+//Đăng xuất các phiên 
+await HttpContext.SignOutAsync();
+await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
+//Đăng nhập phiên
+await HttpContext.SignInAsync(claimsPrincipal);
+
+......
+
+
+***Admin Đăng Nhập
+var claims = new List<Claim> {
+					new Claim(ClaimTypes.Email, admin.Email),
+					new Claim(ClaimTypes.Name, admin.HoTen),
+					new Claim("CustomerID", admin.MaNv),
+
+					//claim - role động
+					new Claim(ClaimTypes.Role, "NhanVien")
+				};
+
+var claimsIdentity = new ClaimsIdentity(claims, "AdminCookieAuthenticationScheme");
+//var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+//Đăng xuất tất cả các phiên đăng nhập
+//await HttpContext.SignOutAsync();
+await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
+await HttpContext.SignOutAsync();
+
+await HttpContext.SignInAsync("AdminCookieAuthenticationScheme",claimsPrincipal);
+
+
+
+***Admin có thể sử dụng
+[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+public IActionResult Profile()
+{
+	return View();
+}
+***Khách Hàng có thể sử dụng
+[Authorize]
+public IActionResult Profile()
+{
+	return View();
+}
+***Khách Hàng hoạc Adim đều có thể sử dụng
+[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme,Cookies")]//nếu chưa đăng nhập chỉ đến Cookies
+public IActionResult ProfileKhachOrAdmin()
+{
+	return View();
+}
