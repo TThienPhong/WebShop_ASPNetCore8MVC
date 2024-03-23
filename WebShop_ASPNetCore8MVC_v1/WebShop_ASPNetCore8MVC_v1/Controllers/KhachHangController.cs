@@ -7,6 +7,7 @@ using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.Helpers;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
@@ -124,7 +125,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 							var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 							var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 							await HttpContext.SignOutAsync();
-							await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
+							//await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
 							await HttpContext.SignInAsync(claimsPrincipal);
 
 							if (Url.IsLocalUrl(ReturnUrl))
@@ -142,6 +143,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 			return View();
 		}
 
+
 		#endregion
 
 		[Authorize]
@@ -149,8 +151,14 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 		{
 			return View();
 		}
+		
+		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme,Cookies")]//nếu chưa đăng nhập chỉ đến Cookies
+		public IActionResult ProfileKhachOrAdmin()
+		{
+			return View();
+		}
 
-		[Authorize]
+		[Authorize ]
 		public async Task<IActionResult> DangXuat()
 		{
 			await HttpContext.SignOutAsync();

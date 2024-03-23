@@ -65,12 +65,14 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 							};
 
 						var claimsIdentity = new ClaimsIdentity(claims, "AdminCookieAuthenticationScheme");
+						//var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 						var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 						//Đăng xuất tất cả các phiên đăng nhập
-						await HttpContext.SignOutAsync();
+						//await HttpContext.SignOutAsync();
 						await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
-						
-						await HttpContext.SignInAsync(claimsPrincipal);
+						await HttpContext.SignOutAsync();
+
+						await HttpContext.SignInAsync("AdminCookieAuthenticationScheme",claimsPrincipal);
 
 						if (Url.IsLocalUrl(ReturnUrl))
 						{
