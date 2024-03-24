@@ -46,11 +46,13 @@ builder.Services.AddAuthentication(options =>
 	 {
 		 options.LoginPath = "/KhachHang/DangNhap";
 		 options.AccessDeniedPath = "/AccessDenied";
+		 options.Cookie.Name = "KhachHang";
 	 })
 	.AddCookie("AdminCookieAuthenticationScheme", options =>
 	{
 		options.LoginPath = "/Admin/DangNhap";
-		options.AccessDeniedPath = "/Admin/AccessDenied"; // ???ng d?n t? ch?i truy c?p cho admin
+		options.AccessDeniedPath = "/Admin/AccessDenied";
+		options.Cookie.Name = "Admin";
 	});
 
 

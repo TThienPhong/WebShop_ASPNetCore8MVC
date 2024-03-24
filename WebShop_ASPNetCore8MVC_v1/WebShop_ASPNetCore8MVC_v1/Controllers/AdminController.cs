@@ -7,6 +7,7 @@ using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using AutoMapper;
 using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
@@ -30,10 +31,20 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
 		#region Login 
 		[HttpGet]
-		public IActionResult DangNhap(string? ReturnUrl)
+		public async Task<IActionResult> DangNhapAsync(string? ReturnUrl)
 		{
 			ViewBag.ReturnUrl = ReturnUrl;
+			//Kiểm tra Admin đã đăng nhập
+			var co = await HttpContext.AuthenticateAsync("AdminCookieAuthenticationScheme");
+			if (co.Succeeded)
+			{
+				
+				return RedirectToAction("Profile", "Admin");
+			}
+			
+
 			return View();
+
 		}
 		[HttpPost]
 		public async Task<IActionResult> DangNhap(LoginVM model, string? ReturnUrl)

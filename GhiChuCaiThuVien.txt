@@ -241,7 +241,7 @@ public async Task<IActionResult> DangNhap(LoginVM model,string? ReturnUrl)
 
 
 
----------------------Phân quyền
+---------------------Phân quyền: Cookie authentication không có ASP.NET Core Identity 
 builder.Services.AddAuthentication(options =>
 {
 	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

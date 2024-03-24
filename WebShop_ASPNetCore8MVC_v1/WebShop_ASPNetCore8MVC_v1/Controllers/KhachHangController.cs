@@ -15,11 +15,13 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
     {
 		private readonly Hshop2023Context db;
 		private readonly IMapper _mapper;
+		
 
 		public KhachHangController(Hshop2023Context context, IMapper mapper)
 		{
 			db = context;
 			_mapper = mapper;
+			
 		}
 
         #region  Register
@@ -81,16 +83,24 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         #endregion
 
         #region Login 
+
+
         [HttpGet]
-        public IActionResult DangNhap(string? ReturnUrl)
+        public async Task<IActionResult> DangNhapAsync(string? ReturnUrl)
         {
-            ViewBag.ReturnUrl = ReturnUrl;
-            return View();
+			
+			var co = await HttpContext.AuthenticateAsync();
+			if (co.Succeeded)
+			{
+				return RedirectToAction("Profile", "KhachHang");
+			}
+			ViewBag.ReturnUrl = ReturnUrl;
+			return View();
         }
         [HttpPost]
         public async Task<IActionResult> DangNhap(LoginVM model,string? ReturnUrl)
         {
-
+		
 			ViewBag.ReturnUrl = ReturnUrl;
 			if (ModelState.IsValid)
 			{
@@ -124,8 +134,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
 							var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 							var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+							
 							await HttpContext.SignOutAsync();
-							//await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
+							await HttpContext.SignOutAsync("AdminCookieAuthenticationScheme");
 							await HttpContext.SignInAsync(claimsPrincipal);
 
 							if (Url.IsLocalUrl(ReturnUrl))
