@@ -134,31 +134,35 @@
 </div>
 <!-- Cart Page End -->
 @section Scripts{
-    console.log("Gia trị cart");
-    $('.quantity-input').change(function() {
-        var quantity = $(this).val();
-        var id = $(this).data('item-id');
-        console.log("Gia trị cart quantity",quantity);
-        console.log("Gia trị cart id",id);
-            let url = `/Cart/UpdateQuantity?id=` + id+`&quantity=`+quantity;
-        window.location.href = url;
+    <script>
+        console.log("Gia trị cart");
+        $('.quantity-input').change(function () {
+            var quantity = $(this).val();
+            var id = $(this).data('item-id');
+            console.log("Gia trị cart quantity", quantity);
+            console.log("Gia trị cart id", id);
+            let url = `/Cart/UpdateQuantity?id=` + id + `&quantity=` + quantity;
+            window.location.href = url;
 
-       @*  // Gửi dữ liệu đến controller
-        $.ajax({
+        @*  // Gửi dữ liệu đến controller
+            $.ajax({
             url: '/Cart/UpdateQuantity', // Thay đổi đường dẫn đến controller và action tương ứng
             type: 'POST',
             data: { id: id, quantity: quantity },
             success: function(response) {
-                // Xử lý phản hồi từ controller nếu cần
-                consolo.log("ajax");
+            // Xử lý phản hồi từ controller nếu cần
+            consolo.log("ajax");
             },
             error: function(xhr, status, error) {
-                // Xử lý lỗi nếu có
-                console.error(xhr.responseText);
+            // Xử lý lỗi nếu có
+            console.error(xhr.responseText);
             }
-            
-        }); *@
-    });
+
+            }); *@
+        });
+
+    </script>
+   
 }
 
   

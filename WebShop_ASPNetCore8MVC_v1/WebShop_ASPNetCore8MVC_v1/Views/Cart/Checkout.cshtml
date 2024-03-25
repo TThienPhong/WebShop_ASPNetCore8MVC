@@ -1,6 +1,7 @@
-﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.CartItem>
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.CheckoutVM
 @{
     ViewData["Title"] = "Checkout";
+   
 }
 
 <!-- Single Page Header start -->
@@ -21,23 +22,32 @@
             <div class="row g-5">
                 <div class="col-md-12 col-lg-6 col-xl-7">
                     <div class="form-check my-3">
-                        <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
-                        <label class="form-check-label" for="GiongKhachHang">Giống thông tin khách hàng?</label>
+                       @*  <input type="checkbox" name="GiongKhachHang" class="form-check-input" id="GiongKhachHang" value="false">
+                        <label class="form-check-label" for="GiongKhachHang">Giống thông tin khách hàng?</label> *@
+                        <button type="button" id="MacDinh">Mặc định </button>
+                        
                     </div>
                     <div class="form-item delivery-info">
-                        <label class="form-label my-3">Người nhận hàng<sup>*</sup></label>
-                        <input type="text" name="HoTen" class="form-control">
+                        <label asp-for="@Model.HoTen" class="form-label my-3"><sup>*</sup></label>
+                        <input asp-for="@Model.HoTen" type="text" class="form-control" id="Model_HoTen">
+                        <span asp-validation-for="@Model.HoTen" class="text-danger"></span>
                     </div>
                     <div class="form-item delivery-info">
-                        <label class="form-label my-3">Địa chỉ nhận hàng<sup>*</sup></label>
-                        <input type="text" name="DiaChi" class="form-control" placeholder="123 Lê Lợi, Quận 1">
+                        <label asp-for="@Model.DiaChi" class="form-label my-3">Địa chỉ nhận hàng<sup>*</sup></label>
+                        <input asp-for="@Model.DiaChi" type="text" class="form-control" placeholder="123 Lê Lợi, Quận 1" id="Model_DiaChi">
+                        <span asp-validation-for="@Model.DiaChi" class="text-danger"></span>
+
                     </div>
                     <div class="form-item delivery-info">
-                        <label class="form-label my-3">Điện thoại<sup>*</sup></label>
-                        <input type="text" name="DienThoai" class="form-control">
+                        <label asp-for="@Model.DienThoai" class="form-label my-3">Điện thoại<sup>*</sup></label>
+                        <input asp-for="@Model.DienThoai" type="text" class="form-control" id="Model_DienThoai">
+                        <span asp-validation-for="@Model.DienThoai" class="text-danger"></span>
+
                     </div>
                     <div class="form-item mt-3">
-                        <textarea name="GhiChu" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Ghi chú"></textarea>
+                        <textarea asp-for="@Model.GhiChu"  class="form-control" spellcheck="false" cols="30" rows="2" placeholder="Ghi chú"></textarea>
+                        <span asp-validation-for="@Model.GhiChu" class="text-danger"></span>
+
                     </div>
                     <button type="submit" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Đặt hàng</button>
                 </div>
@@ -55,7 +65,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model)
+                                @foreach (var item in Model.CartItems)
                                 {
                                     <tr>
                                         <th scope="row">
@@ -83,7 +93,7 @@
                                     </td>
                                     <td class="py-5">
                                         <div class="py-3 border-bottom border-top">
-                                            <p class="mb-0 text-dark">@Model.Sum(p=>p.ThanhTien).ToString("#.##0,00")</p>
+                                            <p class="mb-0 text-dark">@Model.CartItems.Sum(p=>p.ThanhTien).ToString("#.##0,00")</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -170,17 +180,46 @@
 
 <!-- Checkout Page End -->
 @section Scripts {
-	<script>
-		$(document).ready(function () {
-			$("#GiongKhachHang").change(function () {
-				if ($(this).prop("checked")) {
-					$(this).val(true);
-					$(".delivery-info").addClass("d-none");
-				} else {
-					$(this).val(false);
-					$(".delivery-info").removeClass("d-none");
-				}
-			});
-		});
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+            $("#MacDinh").click(function () {
+                console.log("Da bat sk");
+                var hoten = @Json.Serialize(Model.HoTen);
+                var diachi = @Json.Serialize(Model.DiaChi);
+                var dienthoai = @Json.Serialize(Model.DienThoai);
+                if (dienthoai || dienthoai === "") {
+                    $("#Model_HoTen").val(hoten);
+                    $("#Model_DiaChi").val(diachi);
+                    
+                }
+                else {
+                    $("#Model_HoTen").val(hoten);
+                    $("#Model_DiaChi").val(diachi);
+                    $("#Model_DienThoai").val(dienthoai);
+                }
+                
+              
+                
+                // Gán giá trị đã mã hóa vào các phần tử DOM
+                
+            });
+        });
+        
+
+
+        
+        $(document).ready(function () {
+            $("#GiongKhachHang").change(function () {
+                if ($(this).prop("checked")) {
+                    $(this).val(true);
+                    $(".delivery-info").addClass("d-none");
+                } else {
+                    $(this).val(false);
+                    $(".delivery-info").removeClass("d-none");
+                }
+            });
+        });
 	</script>
 }

@@ -36,7 +36,7 @@ namespace WebShop_ASPNetCore8MVC_v1.ViewModels
 
         [Display(Name = "Điện thoại")]
         [MaxLength(24, ErrorMessage = "Tối đa 24 kí tự")]
-        [RegularExpression(@"0[9875]\d{8}", ErrorMessage = "Chưa đúng định dạng di động Việt Nam")]
+        [RegularExpression(@"^(03[2-9]|05[6-9]|07[06-9]|08[1-689]|09[0-46-9])\d{7}$", ErrorMessage = "Chưa đúng định dạng di động Việt Nam")]
         public string? DienThoai { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập Email")]

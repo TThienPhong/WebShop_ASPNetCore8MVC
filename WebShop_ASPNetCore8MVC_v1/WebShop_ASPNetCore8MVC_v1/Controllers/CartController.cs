@@ -18,6 +18,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         public List<CartItem> Cart => HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY) ?? new List<CartItem>();
         public IActionResult Index()
         {
+
             return View(Cart);
         }
             
@@ -92,10 +93,23 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         {
             if (Cart.Count == 0)
             {
-                return Redirect("/");
+                return RedirectToAction("Index");
             }
+            var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
+            var khachHang = db.KhachHangs.SingleOrDefault(kh => kh.MaKh == customerId);
+            if (khachHang != null)
+            {
+                var model = new CheckoutVM(){
+                    GiongKhachHang = false,
+                    HoTen = khachHang.HoTen,
+                    DiaChi = khachHang.DiaChi??"",
+                    DienThoai = khachHang.DienThoai??"",
+                    CartItems = Cart
+                };
 
-            return View(Cart);
+                return View(model);
+            }
+            return RedirectToAction("Index");
         }
 
         [Authorize]
@@ -104,13 +118,15 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         {
             if (ModelState.IsValid)
             {
-                var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
-                var khachHang = new KhachHang();
-                if (model.GiongKhachHang)
-                {
-                    khachHang = db.KhachHangs.SingleOrDefault(kh => kh.MaKh == customerId);
-                }
+                /* var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
+                 var khachHang = new KhachHang();
+                 if (model.GiongKhachHang)
+                 {
+                     khachHang = db.KhachHangs.SingleOrDefault(kh => kh.MaKh == customerId);
+                 }*/
 
+               
+/*
                 var hoadon = new HoaDon
                 {
                     MaKh = customerId,
@@ -122,17 +138,32 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                     CachVanChuyen = "GRAB",
                     MaTrangThai = 0,
                     GhiChu = model.GhiChu
-                };
+                };*/
 
                 db.Database.BeginTransaction();
                 try
                 {
-                    
+
+                    var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
+
+
+                    var hoadon = new HoaDon
+                    {
+                        MaKh = customerId,
+                        HoTen = model.HoTen,
+                        DiaChi = model.DiaChi,
+                        DienThoai = model.DienThoai,
+                        NgayDat = DateTime.Now,
+                        CachThanhToan = "COD",
+                        CachVanChuyen = "GRAB",
+                        MaTrangThai = 0,
+                        GhiChu = model.GhiChu
+                    };
                     db.Add(hoadon);
                     db.SaveChanges();
 
                     var cthds = new List<ChiTietHd>();
-                    foreach (var item in Cart)
+                    foreach (var item in model.CartItems)
                     {
                         cthds.Add(new ChiTietHd
                         {
@@ -155,10 +186,8 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 }
             }
 
-            return View(Cart);
+            return View(model);
         }
-
-
 
     }
 }
