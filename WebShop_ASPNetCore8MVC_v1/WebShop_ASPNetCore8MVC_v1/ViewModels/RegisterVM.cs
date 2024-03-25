@@ -31,6 +31,7 @@ namespace WebShop_ASPNetCore8MVC_v1.ViewModels
 
         [Display(Name = "Địa chỉ")]
         [MaxLength(60, ErrorMessage = "Tối đa 60 kí tự")]
+        [Required(ErrorMessage = "Vui lòng chọn Địa Chỉ")]
         public string? DiaChi { get; set; }
 
         [Display(Name = "Điện thoại")]
