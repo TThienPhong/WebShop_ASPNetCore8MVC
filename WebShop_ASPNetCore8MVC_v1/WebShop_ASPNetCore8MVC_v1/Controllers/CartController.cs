@@ -8,14 +8,22 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
     public class CartController : Controller
     {
+        private readonly PaypalClient _paypalClient;
         private readonly Hshop2023Context db;
+    
 
-        public CartController(Hshop2023Context context)
+        public CartController(Hshop2023Context context, PaypalClient paypalClient)
         {
+            _paypalClient=paypalClient;
             db = context;
+          
         }
 
         public List<CartItem> Cart => HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY) ?? new List<CartItem>();
+
+        #region GioHang
+
+       
         public IActionResult Index()
         {
 
@@ -86,7 +94,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             }   
             return RedirectToAction("Index");
         }
+        #endregion
 
+        #region Checkout
         [Authorize]
         [HttpGet]
         public IActionResult Checkout()
@@ -106,7 +116,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                     DienThoai = khachHang.DienThoai??"",
                     CartItems = Cart
                 };
-
+                ViewBag.PaypalClientdId = _paypalClient.ClientId;
                 return View(model);
             }
             return RedirectToAction("Index");
@@ -188,6 +198,57 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
             return View(model);
         }
+        #endregion
+        [Authorize]
+        public IActionResult PaymentSuccess()
+        {
+            return View("Success");
+        }
+        #region Paypal payment
+        [Authorize]
+        [HttpPost("/Cart/create-paypal-order")]
+        public async Task<IActionResult> CreatePaypalOrder(CancellationToken cancellationToken)
+        {
+            // Thông tin đơn hàng gửi qua Paypal
+            var tongTien = Cart.Sum(p => p.ThanhTien).ToString();
+            var donViTienTe = "USD";
+            var maDonHangThamChieu = "DH" + DateTime.Now.Ticks.ToString();
+            
+            try
+            {               
+                HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());          
+                var response = await _paypalClient.CreateOrder(tongTien, donViTienTe, maDonHangThamChieu);
 
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                db.Database.RollbackTransaction();
+                var error = new { ex.GetBaseException().Message };
+                return BadRequest(error);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("/Cart/capture-paypal-order")]
+        public async Task<IActionResult> CapturePaypalOrder(string orderID, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await _paypalClient.CaptureOrder(orderID);
+
+                // Lưu database đơn hàng của mình
+
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var error = new { ex.GetBaseException().Message };
+                return BadRequest(error);
+            }
+        }
+
+        #endregion
     }
 }

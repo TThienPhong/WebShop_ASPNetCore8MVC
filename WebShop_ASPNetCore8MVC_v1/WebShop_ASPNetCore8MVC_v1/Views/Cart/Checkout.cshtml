@@ -50,6 +50,7 @@
 
                     </div>
                     <button type="submit" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Đặt hàng</button>
+                    <div id="paypal-button-container" class="form-item mt-3" style="max-width:1000px;"></div>
                 </div>
                 <div class="col-md-12 col-lg-6 col-xl-5">
                     <div class="table-responsive">
@@ -128,7 +129,7 @@
                                     <td class="py-5"></td>
                                     <td class="py-5">
                                         <div class="py-3 border-bottom border-top">
-                                            <p class="mb-0 text-dark">$135.00</p>
+                                            <p class="mb-0 text-dark">@Model.CartItems.Sum(p => p.ThanhTien).ToString("#.##0,00")</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -180,9 +181,10 @@
 
 <!-- Checkout Page End -->
 @section Scripts {
+    <script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.PaypalClientdId"></script>
     <script type="text/javascript">
 
-
+       
         $(document).ready(function () {
             $("#MacDinh").click(function () {
                 console.log("Da bat sk");
@@ -198,19 +200,10 @@
                     $("#Model_HoTen").val(hoten);
                     $("#Model_DiaChi").val(diachi);
                     $("#Model_DienThoai").val(dienthoai);
-                }
-                
-              
-                
-                // Gán giá trị đã mã hóa vào các phần tử DOM
-                
+                }              
             });
-        });
-        
 
 
-        
-        $(document).ready(function () {
             $("#GiongKhachHang").change(function () {
                 if ($(this).prop("checked")) {
                     $(this).val(true);
@@ -221,5 +214,38 @@
                 }
             });
         });
+
+        paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color: 'silver',
+                tagline: 'false'
+            },
+            createOrder: (data, actions) => {
+                return fetch("/Cart/create-paypal-order", {
+                    method: "post",
+                }).then((response) => {
+                    if (!response.ok) {
+                        return response.json().then(error => { throw error; });
+                    }
+                    return response.json();
+                }).then((order) => order.id)
+                    .catch(error => alert(error.message));
+            },
+            //trong onApprove: (data, actions), data được lấy từ đâu? 
+            onApprove: (data, actions) => {
+                return fetch(`/Cart/capture-paypal-order?orderId=${data.orderID}`, {
+                    method: "post",
+                }).then((response) => {
+                    if (!response.ok) {
+                        return response.json().then(error => { throw error; });
+                    }
+                    //Đổi địa chỉ tới action thông báo thành công
+                    window.location.href = "/Cart/PaymentSuccess";
+                }).catch(error => alert(error.message));
+            }
+        }).render('#paypal-button-container');
+
+      
 	</script>
 }

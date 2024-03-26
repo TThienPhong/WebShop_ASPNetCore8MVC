@@ -57,7 +57,11 @@ builder.Services.AddAuthentication(options =>
 
 
 
-
+builder.Services.AddSingleton(x => new PaypalClient(
+        builder.Configuration["PaypalOptions:AppId"],
+        builder.Configuration["PaypalOptions:AppSecret"],
+        builder.Configuration["PaypalOptions:Mode"]
+));
 
 
 var app = builder.Build();
