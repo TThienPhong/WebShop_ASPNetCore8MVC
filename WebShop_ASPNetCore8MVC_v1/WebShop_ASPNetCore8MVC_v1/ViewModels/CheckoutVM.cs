@@ -5,7 +5,7 @@ namespace WebShop_ASPNetCore8MVC_v1.ViewModels
 {
     public class CheckoutVM
     {
-        public bool GiongKhachHang { get; set; }
+        public bool CollectedMoney { get; set; }
 
 
         [Display(Name = "Họ tên người nhận")]

@@ -4,13 +4,15 @@ using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using WebShop_ASPNetCore8MVC_v1.Helpers;
 using Microsoft.AspNetCore.Authorization;
 
+
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
     public class CartController : Controller
     {
         private readonly PaypalClient _paypalClient;
         private readonly Hshop2023Context db;
-    
+        private  CheckoutVM _checkoutVM =new CheckoutVM();
+
 
         public CartController(Hshop2023Context context, PaypalClient paypalClient)
         {
@@ -97,6 +99,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         #endregion
 
         #region Checkout
+       
+
+
         [Authorize]
         [HttpGet]
         public IActionResult Checkout()
@@ -110,7 +115,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             if (khachHang != null)
             {
                 var model = new CheckoutVM(){
-                    GiongKhachHang = false,
+                    CollectedMoney = false,
                     HoTen = khachHang.HoTen,
                     DiaChi = khachHang.DiaChi??"",
                     DienThoai = khachHang.DienThoai??"",
@@ -166,9 +171,12 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                         NgayDat = DateTime.Now,
                         CachThanhToan = "COD",
                         CachVanChuyen = "GRAB",
+                        
                         MaTrangThai = 0,
                         GhiChu = model.GhiChu
                     };
+                    if (model.CollectedMoney=true)
+                    { hoadon.MaTrangThai = 1; }    
                     db.Add(hoadon);
                     db.SaveChanges();
 
@@ -198,10 +206,12 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
             return View(model);
         }
+       
         #endregion
         [Authorize]
         public IActionResult PaymentSuccess()
         {
+            //db.Database.CommitTransaction();
             return View("Success");
         }
         #region Paypal payment
@@ -216,7 +226,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             
             try
             {               
-                HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());          
+                        
                 var response = await _paypalClient.CreateOrder(tongTien, donViTienTe, maDonHangThamChieu);
 
                 return Ok(response);
@@ -237,13 +247,14 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             {
                 var response = await _paypalClient.CaptureOrder(orderID);
 
-                // Lưu database đơn hàng của mình
-
+                
+                //db.Database.CommitTransaction();
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                //db.Database.RollbackTransaction();
                 var error = new { ex.GetBaseException().Message };
                 return BadRequest(error);
             }

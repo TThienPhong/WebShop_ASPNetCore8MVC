@@ -18,7 +18,7 @@
 <div class="container-fluid py-5">
     <div class="container py-5">
         <h1 class="mb-4">Billing details</h1>
-        <form asp-action="Checkout" asp-controller="Cart">
+        <form asp-action="Checkout" asp-controller="Cart" method="post">
             <div class="row g-5">
                 <div class="col-md-12 col-lg-6 col-xl-7">
                     <div class="form-check my-3">
@@ -45,11 +45,11 @@
 
                     </div>
                     <div class="form-item mt-3">
-                        <textarea asp-for="@Model.GhiChu"  class="form-control" spellcheck="false" cols="30" rows="2" placeholder="Ghi chú"></textarea>
+                        <textarea asp-for="@Model.GhiChu" class="form-control" spellcheck="false" cols="30" rows="2" placeholder="Ghi chú" id="Model_GhiChu"></textarea>
                         <span asp-validation-for="@Model.GhiChu" class="text-danger"></span>
 
                     </div>
-                    <button type="submit" class="btn border-secondary text-uppercase text-primary w-100 mt-2">Đặt hàng</button>
+                    <button type="submit" class="btn border-secondary text-uppercase text-primary w-100 mt-2" id="Submit_Order">Tiến hành đặc hàng</button>
                     <div id="paypal-button-container" class="form-item mt-3" style="max-width:1000px;"></div>
                 </div>
                 <div class="col-md-12 col-lg-6 col-xl-5">
@@ -183,7 +183,10 @@
 @section Scripts {
     <script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.PaypalClientdId"></script>
     <script type="text/javascript">
-
+        function submitOrther() {
+            // Gọi sự kiện click của nút "submit_Orther"
+            document.getElementById("Submit_Order").click();
+        }
        
         $(document).ready(function () {
             $("#MacDinh").click(function () {
@@ -228,11 +231,11 @@
                     if (!response.ok) {
                         return response.json().then(error => { throw error; });
                     }
+
                     return response.json();
                 }).then((order) => order.id)
-                    .catch(error => alert(error.message));
+                  .catch(error => alert(error.message));
             },
-            //trong onApprove: (data, actions), data được lấy từ đâu? 
             onApprove: (data, actions) => {
                 return fetch(`/Cart/capture-paypal-order?orderId=${data.orderID}`, {
                     method: "post",
@@ -240,8 +243,11 @@
                     if (!response.ok) {
                         return response.json().then(error => { throw error; });
                     }
+
                     //Đổi địa chỉ tới action thông báo thành công
                     window.location.href = "/Cart/PaymentSuccess";
+                    //@Model.CollectedMoney=true;
+                    //submitOrther();
                 }).catch(error => alert(error.message));
             }
         }).render('#paypal-button-container');
