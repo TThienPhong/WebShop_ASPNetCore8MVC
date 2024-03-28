@@ -3,6 +3,7 @@ using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using WebShop_ASPNetCore8MVC_v1.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using WebShop_ASPNetCore8MVC_v1.Services;
 
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
@@ -11,15 +12,19 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
     {
         private readonly PaypalClient _paypalClient;
         private readonly Hshop2023Context db;
-        private  CheckoutVM _checkoutVM =new CheckoutVM();
+        private  static CheckoutVM _checkoutVM ;
+        private readonly IVnPayService _vnPayservice;
 
-
-        public CartController(Hshop2023Context context, PaypalClient paypalClient)
+        public CartController(Hshop2023Context context, PaypalClient paypalClient, IVnPayService vnPayservice)
         {
             _paypalClient=paypalClient;
             db = context;
-          
-        }
+            _vnPayservice = vnPayservice;
+			CheckoutVM _checkoutVM=new CheckoutVM();
+
+
+
+		}
 
         public List<CartItem> Cart => HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY) ?? new List<CartItem>();
 
@@ -129,71 +134,75 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
         [Authorize]
         [HttpPost]
-        public IActionResult Checkout(CheckoutVM model)
+        public IActionResult Checkout(CheckoutVM model, string payment = "COD")
         {
-            if (ModelState.IsValid)
+;
+			if (ModelState.IsValid)
             {
-                /* var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
-                 var khachHang = new KhachHang();
-                 if (model.GiongKhachHang)
-                 {
-                     khachHang = db.KhachHangs.SingleOrDefault(kh => kh.MaKh == customerId);
-                 }*/
+				var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
+                _checkoutVM = new CheckoutVM() {
+                    HoTen = model.HoTen,
+                    DiaChi = model.DiaChi,
+                    DienThoai = model.DienThoai,
+                    GhiChu = model.GhiChu,
+                    CartItems = Cart.ToList()
+				} ;
+                
+				if (payment == "Thanh toán VNPay")
+				{
+                    
+					var vnPayModel = new VnPaymentRequestModel
+					{
+						Amount = Cart.Sum(p => p.ThanhTien),
+						CreatedDate = DateTime.Now,
+						Description = $"{model.HoTen} {model.DienThoai}",
+						FullName = model.HoTen,
+						OrderId = new Random().Next(1000, 100000)
+					};
+					return Redirect(_vnPayservice.CreatePaymentUrl(HttpContext, vnPayModel));
+				}
+				db.Database.BeginTransaction();
+				try
+				{
 
-               
-/*
-                var hoadon = new HoaDon
-                {
-                    MaKh = customerId,
-                    HoTen = model.HoTen ?? khachHang.HoTen,
-                    DiaChi = model.DiaChi ?? khachHang.DiaChi,
-                    DienThoai = model.DienThoai ?? khachHang.DienThoai,
-                    NgayDat = DateTime.Now,
-                    CachThanhToan = "COD",
-                    CachVanChuyen = "GRAB",
-                    MaTrangThai = 0,
-                    GhiChu = model.GhiChu
-                };*/
-
-                db.Database.BeginTransaction();
-                try
-                {
-
-                    var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
+					
 
 
-                    var hoadon = new HoaDon
-                    {
-                        MaKh = customerId,
-                        HoTen = model.HoTen,
-                        DiaChi = model.DiaChi,
-                        DienThoai = model.DienThoai,
-                        NgayDat = DateTime.Now,
-                        CachThanhToan = "COD",
-                        CachVanChuyen = "GRAB",
-                        
-                        MaTrangThai = 0,
-                        GhiChu = model.GhiChu
-                    };
-                    if (model.CollectedMoney=true)
-                    { hoadon.MaTrangThai = 1; }    
-                    db.Add(hoadon);
-                    db.SaveChanges();
+					var hoadon = new HoaDon
+					{
+						MaKh = customerId,
+						HoTen = model.HoTen,
+						DiaChi = model.DiaChi,
+						DienThoai = model.DienThoai,
+						NgayDat = DateTime.Now,
+						CachThanhToan = "COD",
+						CachVanChuyen = "GRAB",
 
-                    var cthds = new List<ChiTietHd>();
-                    foreach (var item in model.CartItems)
-                    {
-                        cthds.Add(new ChiTietHd
-                        {
-                            MaHd = hoadon.MaHd,
-                            SoLuong = item.SoLuong,
-                            DonGia = item.DonGia,
-                            MaHh = item.MaHh,
-                            GiamGia = 0
-                        });
-                    }
-                    db.AddRange(cthds);
-                    db.SaveChanges();
+						MaTrangThai = 0,
+						GhiChu = model.GhiChu
+					};
+					
+					db.Add(hoadon);
+					db.SaveChanges();
+
+					var cthds = new List<ChiTietHd>();
+					foreach (var item in _checkoutVM.CartItems)
+					{
+						cthds.Add(new ChiTietHd
+						{
+							MaHd = hoadon.MaHd,
+							SoLuong = item.SoLuong,
+							DonGia = item.DonGia,
+							MaHh = item.MaHh,
+							GiamGia = 0
+						});
+					}
+					db.AddRange(cthds);
+					db.SaveChanges();
+
+					
+
+              
                     db.Database.CommitTransaction();
                     HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());                   
                     return View("Success");
@@ -233,7 +242,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             }
             catch (Exception ex)
             {
-                db.Database.RollbackTransaction();
+                //db.Database.RollbackTransaction();
                 var error = new { ex.GetBaseException().Message };
                 return BadRequest(error);
             }
@@ -261,5 +270,83 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         }
 
         #endregion
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult PaymentFail()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult PaymentCallBack()
+        {
+            var response = _vnPayservice.PaymentExecute(Request.Query);
+
+            if (response == null || response.VnPayResponseCode != "00")
+            {
+				//db.Database.RollbackTransaction();
+				TempData["Message"] = $"Lỗi thanh toán VN Pay: {response.VnPayResponseCode}";
+                return RedirectToAction("PaymentFail");
+            }
+
+
+			// Lưu đơn hàng vô database
+			db.Database.BeginTransaction();
+			try
+			{
+
+				var customerId = HttpContext.User.Claims.SingleOrDefault(p => p.Type == MySetting.CLAIM_CUSTOMERID).Value;
+
+
+				var hoadon = new HoaDon
+				{
+					MaKh = customerId,
+					HoTen = _checkoutVM.HoTen,
+					DiaChi = _checkoutVM.DiaChi,
+					DienThoai = _checkoutVM.DienThoai,
+					NgayDat = DateTime.Now,
+					CachThanhToan = PaymentType.VNPAY,
+					CachVanChuyen = "GRAB",
+
+					MaTrangThai = 1,
+					GhiChu = _checkoutVM.GhiChu
+				};
+				if (_checkoutVM.CollectedMoney = true)
+				{ hoadon.MaTrangThai = 1; }
+				db.Add(hoadon);
+				db.SaveChanges();
+
+				var cthds = new List<ChiTietHd>();
+				foreach (var item in _checkoutVM.CartItems)
+				{
+					cthds.Add(new ChiTietHd
+					{
+						MaHd = hoadon.MaHd,
+						SoLuong = item.SoLuong,
+						DonGia = item.DonGia,
+						MaHh = item.MaHh,
+						GiamGia = 0
+					});
+				}
+				db.AddRange(cthds);
+				db.SaveChanges();
+
+
+				db.Database.CommitTransaction();
+				HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());
+
+				
+			}
+			catch
+			{
+
+				db.Database.RollbackTransaction();
+				TempData["Message"] = $"Đơn hàng không đặt được, liên hệ HShop để hoàn tiền {response.VnPayResponseCode}";
+				return RedirectToAction("PaymentFail");
+			}
+			TempData["Message"] = $"Thanh toán VNPay thành công";
+            return RedirectToAction("PaymentSuccess");
+        }
     }
 }

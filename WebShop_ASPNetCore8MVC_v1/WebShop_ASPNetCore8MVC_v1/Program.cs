@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.Helpers;
+using WebShop_ASPNetCore8MVC_v1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +63,7 @@ builder.Services.AddSingleton(x => new PaypalClient(
         builder.Configuration["PaypalOptions:AppSecret"],
         builder.Configuration["PaypalOptions:Mode"]
 ));
-
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 
 var app = builder.Build();
 
