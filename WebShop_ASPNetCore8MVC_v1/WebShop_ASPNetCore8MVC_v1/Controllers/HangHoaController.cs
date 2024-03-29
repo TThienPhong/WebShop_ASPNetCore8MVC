@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
@@ -15,8 +16,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         {            
             db = _context;
         }
-        
-        public IActionResult Index(int? loai)
+		#region HangHoa_KhachHang
+
+		public IActionResult Index(int? loai)
         {
             var hangHoas = db.HangHoas.AsQueryable();
            
@@ -87,5 +89,22 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             };
             return View(result);
         }
+        #endregion
+
+        #region HangHoa_Admin
+
+        /*[HttpGet]
+		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+		public IActionResult AdminGet(int? loai, string? query)
+        {
+            var result=new List<HangHoaVM> ();
+            if (loai.HasValue)
+            {
+
+            }
+
+		}*/
+      
+        #endregion
     }
 }

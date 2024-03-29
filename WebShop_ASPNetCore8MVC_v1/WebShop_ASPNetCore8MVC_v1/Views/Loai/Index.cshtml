@@ -1,0 +1,85 @@
+﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM>
+@{
+    ViewData["Title"] = "Index";
+    
+}
+
+
+
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Cart</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+        <li class="breadcrumb-item active text-white">Quản lý Loại</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div>
+            <th>
+                <tr>
+                    <button id="updateLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase  text-primary">Thêm mới</button></p>
+                </tr>
+                <tr>
+
+                    <div class="input-group w-100 mx-auto d-flex">
+                        <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="searchLoaiButton" name="query" id="searchLoaiText">
+                        <span id="searchLoaiButton" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                    </div>
+
+
+                </tr>
+            </th>
+        </div>
+        
+        <div class="table-responsive">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Mã Loại</th>
+                        <th scope="col">Tên</th>
+                        <th scope="col">Số Lượng</th>
+                       
+                      
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                           
+                            <td>
+                                <p class="mb-0 mt-4">@item.MaLoai</p>
+                            </td>
+                            <td>
+                                <p class="mb-0 mt-4">@item.TenLoai</p>
+                            </td>
+                            <td>
+                                <p class="mb-0 mt-4">@item.SoLuong</p>
+                            </td>
+                            <td>
+                                <button id="updateLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase  text-primary">Sửa</button>
+                            </td>
+                            <td>
+                                <button id="deleteLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase  text-primary">Xoá</button>
+                            </td>
+                          
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>      
+    </div>
+</div>
+<!-- Cart Page End -->
+@section Scripts {
+    <script>
+        
+
+    </script>
+
+}

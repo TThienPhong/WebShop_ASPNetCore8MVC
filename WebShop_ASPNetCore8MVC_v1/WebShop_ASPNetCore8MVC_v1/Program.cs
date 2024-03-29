@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebShop_ASPNetCore8MVC_v1.Data;
+using WebShop_ASPNetCore8MVC_v1.ExtendMethods;
 using WebShop_ASPNetCore8MVC_v1.Helpers;
 using WebShop_ASPNetCore8MVC_v1.Services;
 
@@ -64,6 +65,7 @@ builder.Services.AddSingleton(x => new PaypalClient(
         builder.Configuration["PaypalOptions:Mode"]
 ));
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
+builder.Services.AddScoped<ILoaiHangHoaService, LoaiHangHoaService>();
 
 var app = builder.Build();
 
@@ -77,6 +79,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.AddStatusCodePage();//Code 400 599
+
 
 app.UseRouting();
 
