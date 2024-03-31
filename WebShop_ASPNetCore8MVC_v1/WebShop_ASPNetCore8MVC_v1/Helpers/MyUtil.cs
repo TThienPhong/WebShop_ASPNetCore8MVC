@@ -8,6 +8,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
 		{
 			try
 			{
+
 				var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Hinh", folder, Hinh.FileName);
 				using (var myfile = new FileStream(fullPath, FileMode.CreateNew))
 				{

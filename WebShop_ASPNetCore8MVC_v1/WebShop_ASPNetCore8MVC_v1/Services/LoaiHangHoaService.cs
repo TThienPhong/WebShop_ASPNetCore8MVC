@@ -1,6 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Humanizer;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebShop_ASPNetCore8MVC_v1.Services
 {
@@ -13,22 +17,37 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 			_context = context;
 		}
 
-		public List<MenuLoaiVM> GetAll()
+		public List<MenuLoaiVM> GetAll(string? query)
 		{
-			var data = _context.Loais.Select(lo => new MenuLoaiVM
+			var data= _context.Loais.AsQueryable();
+            #region Filtering
+            if (!string.IsNullOrEmpty(query))
+            {
+				int number=-1;
+                bool isNumber = int.TryParse(query, out number);
+
+                data = data.Where(item => item.TenLoai.Contains(query)|| item.MaLoai==number);
+            }          
+            #endregion
+
+
+            var result = data.Select(lo => new MenuLoaiVM
 			{
 				MaLoai = lo.MaLoai,
 				TenLoai = lo.TenLoai,
 				SoLuong = lo.HangHoas.Count
-			}).OrderBy(p => p.TenLoai);
+			}).OrderBy(i => i.TenLoai);
 
-			return data.ToList();
+
+			return result.ToList();
 		}
 
 		public MenuLoaiVM GetById(int loaiHHId)
 		{
-			var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == loaiHHId);
-			if (loai != null)
+            var loai = _context.Loais
+				.Include(lo => lo.HangHoas) // Include dữ liệu từ bảng HangHoa vào bảng Loais
+				.SingleOrDefault(lo => lo.MaLoai == loaiHHId);
+            if (loai != null)
 			{
 				return new MenuLoaiVM
 				{
@@ -45,18 +64,26 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 			{
 				throw new ArgumentNullException(nameof(loaiHH), "cannot be null.");
 			}
-
-			var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == loaiHH.MaLoai);
-			if (loai != null)
-			{
-				loai.TenLoai = loaiHH.TenLoai;
-				_context.SaveChanges();
-			}
 			else
 			{
-				throw new ArgumentException("Loai not found.", nameof(loaiHH));
-			}
-		}
+                try
+                {
+					
+                    Loai newLoai = new Loai
+                    {
+                        TenLoai = loaiHH.TenLoai
+
+                    };
+                    _context.Add(newLoai);
+                    _context.SaveChanges();
+
+                }
+                catch (Exception ex)
+                {
+                    throw new ArgumentException("Loai not found.", nameof(loaiHH), ex);
+                }              
+            }
+        }
 
 		public void Delete(int loaiHHId)
 		{
@@ -65,8 +92,18 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 			var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == loaiHHId);
 			if (loai != null)
 			{
-				_context.Remove(loai);
-				_context.SaveChanges();
+				
+				try 
+				{
+                    _context.Remove(loai);
+                    _context.SaveChanges();
+                    
+                }
+				catch(Exception ex)
+				{
+                    throw new InvalidOperationException($"{loai.TenLoai}-{loai.MaLoai} Không thể bị xoá", ex);
+
+                }
 			}
 			else
 			{

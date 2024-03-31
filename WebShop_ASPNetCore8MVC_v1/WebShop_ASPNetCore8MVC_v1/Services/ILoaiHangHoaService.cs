@@ -6,7 +6,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 	public interface ILoaiHangHoaService
 	{
 		
-		List<MenuLoaiVM> GetAll();
+		List<MenuLoaiVM> GetAll(string? query);
 		MenuLoaiVM GetById(int loaiHHId);
 		void Add(MenuLoaiVM loaiHH);
 		void Update(MenuLoaiVM loaiHH);

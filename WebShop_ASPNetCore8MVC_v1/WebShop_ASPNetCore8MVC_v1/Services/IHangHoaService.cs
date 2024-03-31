@@ -5,8 +5,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 {
 	public interface IHangHoaService
 	{
-		List<HangHoaVM> GetAllProducts(int? loai, string? query);
-		void AddProduct(HangHoaVM product);
+		List<HangHoaVM> GetAll(int? loai, string? query);
+        HangHoaVM GetById(int id);
+        void AddProduct(HangHoaVM product);
 		void UpdateProduct(HangHoaVM product);
 		void DeleteProduct(int productId);
 	}

@@ -164,10 +164,6 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 				db.Database.BeginTransaction();
 				try
 				{
-
-					
-
-
 					var hoadon = new HoaDon
 					{
 						MaKh = customerId,
@@ -199,10 +195,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 					}
 					db.AddRange(cthds);
 					db.SaveChanges();
-
-					
-
-              
+            
                     db.Database.CommitTransaction();
                     HttpContext.Session.Set<List<CartItem>>(MySetting.CART_KEY, new List<CartItem>());                   
                     return View("Success");
@@ -312,8 +305,8 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 					MaTrangThai = 1,
 					GhiChu = _checkoutVM.GhiChu
 				};
-				if (_checkoutVM.CollectedMoney = true)
-				{ hoadon.MaTrangThai = 1; }
+				/*if (_checkoutVM.CollectedMoney == true)
+				{ hoadon.MaTrangThai = 1; }*/
 				db.Add(hoadon);
 				db.SaveChanges();
 

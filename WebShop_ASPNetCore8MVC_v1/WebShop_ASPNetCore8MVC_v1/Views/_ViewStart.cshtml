@@ -1,3 +1,20 @@
 ﻿@{
-    Layout = "_LayoutCustomer";
+    //Layout = "_LayoutCustomer";
+    //var co = await User.IsAuthenticated("AdminCookieAuthenticationScheme");
+    //string layoutName = co.Succeeded ? "_LayoutAdmin" : "_LayoutCustomer";
+    Layout = DetermineLayout();
+}
+@functions {
+    private string DetermineLayout()
+    {
+        var authScheme = Context.Request.Cookies["Admin"];
+        if (authScheme!=null)
+        {
+            return "_LayoutAdmin";
+        }
+        else
+        {
+            return "_Layoutcustomer";
+        }
+    }
 }

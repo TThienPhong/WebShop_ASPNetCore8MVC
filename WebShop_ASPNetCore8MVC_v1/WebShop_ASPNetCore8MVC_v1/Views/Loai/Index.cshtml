@@ -1,10 +1,49 @@
-﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM>
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM
 @{
-    ViewData["Title"] = "Index";
     
+    ViewData["Title"] = "Index";
+    var loaiMV = new WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM();
+    string message = "";
+    if (TempData["Message"] != null)
+    {
+        message = TempData["Message"].ToString();
+
+    }
+   
+    var loaiList = TempData["loaiList"] as List<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM>() ;
 }
 
+@section Styles{
+    <style>
+        /* CSS để chia trang thành hai phần */
+        .split-container {
+            display: flex;
+            height: 100vh;
+        }
 
+        .hidden {
+            display: none;
+        }
+
+
+        .split-left{
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .split-right {
+            flex: 2;
+            overflow-y: auto;
+        }
+
+        .split-handle {
+            width: 10px;
+            cursor: ew-resize;
+            background-color: #ccc;
+        }
+    </style>
+
+}
 
 <div class="container-fluid page-header py-5">
     <h1 class="text-center text-white display-6">Cart</h1>
@@ -18,68 +57,223 @@
 <!-- Cart Page Start -->
 <div class="container-fluid py-5">
     <div class="container py-5">
-        <div>
-            <th>
-                <tr>
-                    <button id="updateLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase  text-primary">Thêm mới</button></p>
-                </tr>
-                <tr>
-
-                    <div class="input-group w-100 mx-auto d-flex">
-                        <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="searchLoaiButton" name="query" id="searchLoaiText">
-                        <span id="searchLoaiButton" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                    </div>
-
-
-                </tr>
-            </th>
-        </div>
-        
-        <div class="table-responsive">
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Mã Loại</th>
-                        <th scope="col">Tên</th>
-                        <th scope="col">Số Lượng</th>
-                       
-                      
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+        <div class="split-container">
+            <div class="split-left">
+                <!-- Nội dung bên trái -->
+               
+                <div>
+                    <th>
                         <tr>
-                           
-                            <td>
-                                <p class="mb-0 mt-4">@item.MaLoai</p>
-                            </td>
-                            <td>
-                                <p class="mb-0 mt-4">@item.TenLoai</p>
-                            </td>
-                            <td>
-                                <p class="mb-0 mt-4">@item.SoLuong</p>
-                            </td>
-                            <td>
-                                <button id="updateLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase  text-primary">Sửa</button>
-                            </td>
-                            <td>
-                                <button id="deleteLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase  text-primary">Xoá</button>
-                            </td>
-                          
+                            <button id="createLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="AddForm()">Thêm mới</button>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>      
+                        <tr>
+                            <div class="text-danger" asp-validation-summary="All"></div>
+                            <form asp-controller="Loai" asp-action="Index" method="get">
+                                <div class="input-group w-100 mx-auto d-flex">
+                                    <input type="search" class="p-2" placeholder="keywords" aria-describedby="searchLoaiButton" name="query" id="searchLoaiText">
+                                    <span id="searchLoaiButton" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                                </div>
+                            </form>                          
+                        </tr>
+                    </th>
+
+                    @* -----------------From thêm---------------------- *@
+                    <div class="container py-5 hidden" id="addForm">
+                        <form asp-action="Add" asp-controller="Loai" method="post">
+
+                            <div>
+                                <h1>Thêm Loại</h1>
+                                <div class="text-danger" asp-validation-summary="All"></div>   
+                                <div class="row">
+                                    <label asp-for="@loaiMV.MaLoai" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@loaiMV.MaLoai" name="MaLoai" readonly class="form-control">
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@loaiMV.TenLoai" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@loaiMV.TenLoai" name="TenLoai" class="form-control">
+                                    <span asp-validation-for="@Model.TenLoai" class="text-danger"></span>
+                                </div>
+                                <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                                    <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
+
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                   
+                    @* -----------------End From thêm---------------------- *@
+
+
+                    @* -----------------From sửa---------------------- *@
+                    <div class="container py-5 hidden" id="updateForm">
+
+                        <form asp-action="Update" asp-controller="Loai" method="post" >
+                            <div>
+                                <h1>Sửa Loại</h1>
+                                <div class="text-danger" asp-validation-summary="All"></div>
+                                <div>
+                                    <div class="row">
+                                        <label asp-for="@loaiMV.MaLoai" class="form-label my-3"></label><sup>*</sup>
+                                        <input asp-for="@loaiMV.MaLoai" readonly class="form-control" id="Model_MaLoai" name="MaLoai">
+                                    </div>
+                                    <div class="row">
+                                        <label asp-for="@loaiMV.TenLoai" class="form-label my-3"></label><sup>*</sup>
+                                        <input asp-for="@loaiMV.TenLoai" class="form-control" id="Model_TenLoai" name="TenLoai">
+                                        <span asp-validation-for="@Model.TenLoai" class="text-danger"></span>
+                                    </div>
+                                    <div class="row">
+                                        <label asp-for="@loaiMV.SoLuong" class="form-label my-3"></label><sup>*</sup>
+                                        <input asp-for="@Model.SoLuong" readonly class="form-control" id="Model_SoLuong">
+                                        
+                                    </div>
+                                    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                                        <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    @* -----------------End From sửa---------------------- *@
+                </div>
+
+            </div>
+
+
+
+            <div class="split-handle"></div>
+            <div class="split-right">
+                <!-- Nội dung bên phải -->
+                <!----------------------- Thông báo -->
+                <div id="successMessage" class="alert alert-success" style="display: none;">
+                    <h3 class="text-danger">@message</h3>
+                    <button type="button" class="close" onclick="closeMessage()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!----------------------- end Thông báo -->
+                
+                <div class="table-responsive">
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Mã Loại</th>
+                                <th scope="col">Tên</th>
+                                <th scope="col">Số Lượng</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in loaiList)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.MaLoai</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.TenLoai</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.SoLuong</p>
+                                    </td>
+                                    <td>
+                                        <button type="button" id="updateLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="UpdateForm('@item.MaLoai', '@item.TenLoai', '@item.SoLuong')">Sửa</button>
+                                    </td>
+                                    <td>
+                                        <a asp-action="Delete" asp-controller="Loai" asp-route-id="@item.MaLoai" id="deleteLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary">Xoá</a>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        
+        
+       
     </div>
 </div>
 <!-- Cart Page End -->
 @section Scripts {
     <script>
-        
+        // JavaScript để cho phép kéo thu phóng
+        const handle = document.querySelector('.split-handle');
+        const leftPane = document.querySelector('.split-left');
+        const rightPane = document.querySelector('.split-right');
+        let isDragging = false;
+
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const xPos = e.clientX;
+            const containerRect = document.querySelector('.split-container').getBoundingClientRect();
+            const leftWidth = xPos - containerRect.left;
+
+            leftPane.style.width = leftWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        function AddForm() {
+            const addForm = document.getElementById('addForm');
+            const updateForm = document.getElementById('updateForm');
+
+            // Kiểm tra xem form1 đang được hiển thị hay không
+            //const form1Visible = !form1.classList.contains('hidden');
+
+            // Ẩn hoặc hiển thị form tùy thuộc vào trạng thái hiện tại của form1
+            updateForm.classList.add('hidden');
+            addForm.classList.remove('hidden');
+        };
+        function UpdateForm(maLoai, tenLoai, soLuong) {
+            const addForm = document.getElementById('addForm');
+            const updateForm = document.getElementById('updateForm');
+
+            // Kiểm tra xem form1 đang được hiển thị hay không
+            //const form1Visible = !form1.classList.contains('hidden');
+
+            // Ẩn hoặc hiển thị form tùy thuộc vào trạng thái hiện tại của form1
+            addForm.classList.add('hidden');
+            updateForm.classList.remove('hidden');
+
+            console.log("Sửa thông tin cho mục có mã loại là: " + maLoai);
+            console.log("Tên loại: " + tenLoai);
+            console.log("Số lượng: " + soLuong);
+
+            $("#Model_MaLoai").val(maLoai);
+            $("#Model_TenLoai").val(tenLoai);
+            $("#Model_SoLuong").val(soLuong);
+        };
+
+        //----------------Hiển thị thông báo
+        if (@message.Length>0){
+            showSuccessMessage();
+        }
+        else {
+            closeMessage();
+        }
+        function showSuccessMessage() {
+            document.getElementById("successMessage").style.display = "block";
+        }
+
+        function closeMessage() {
+            document.getElementById("successMessage").style.display = "none";
+        }
+
 
     </script>
-
 }

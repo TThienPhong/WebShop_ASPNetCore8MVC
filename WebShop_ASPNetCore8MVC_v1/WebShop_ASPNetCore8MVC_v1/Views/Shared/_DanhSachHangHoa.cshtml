@@ -1,8 +1,24 @@
 ﻿
 @{
     
-    Layout = "_Layoutcustomer";
+    //Layout = "_Layoutcustomer";
+    string DetermineLayout()
+    {
+        var authScheme = Context.Request.Cookies["Admin"];
+        if (authScheme != null)
+        {
+            return "_LayoutAdmin";
+        }
+        else
+        {
+            return "_Layoutcustomer";
+        }
+    }
+
+    Layout = DetermineLayout();
+    
 }
+
 
 <!-- Single Page Header start -->
 @RenderSection("BreadCum", required: false)

@@ -195,7 +195,7 @@
                 var hoten = @Json.Serialize(Model.HoTen);
                 var diachi = @Json.Serialize(Model.DiaChi);
                 var dienthoai = @Json.Serialize(Model.DienThoai);
-                if (dienthoai || dienthoai === "") {
+                if (dienthoai==null || dienthoai == "") {
                     $("#Model_HoTen").val(hoten);
                     $("#Model_DiaChi").val(diachi);
                     
