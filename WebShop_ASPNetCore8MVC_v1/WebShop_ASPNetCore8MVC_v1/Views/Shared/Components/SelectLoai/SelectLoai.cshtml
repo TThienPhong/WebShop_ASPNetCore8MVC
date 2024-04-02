@@ -1,0 +1,6 @@
+﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM>
+
+@foreach(var item in Model)
+{
+    <option value="@item.MaLoai">"@item.MaLoai"-"@item.TenLoai"</option>
+}

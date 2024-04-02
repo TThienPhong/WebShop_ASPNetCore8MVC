@@ -1,29 +1,40 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using WebShop_ASPNetCore8MVC_v1.Data;
+using WebShop_ASPNetCore8MVC_v1.Models;
+using WebShop_ASPNetCore8MVC_v1.Services;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
     public class HangHoaController : Controller
     {
+        private readonly IHangHoaService _hangHoaService;
         private readonly Hshop2023Context db;
+        private readonly ILoaiHangHoaService _loaiHangHoaService;
+        private readonly IMapper _mapper;
 
-        public HangHoaController(Hshop2023Context _context) 
-        {            
+        public HangHoaController(Hshop2023Context _context,IHangHoaService hangHoaService,ILoaiHangHoaService loaiHangHoaService,IMapper mapper) 
+        {
+            _hangHoaService=hangHoaService;
             db = _context;
+            _loaiHangHoaService = loaiHangHoaService;
+            _mapper = mapper;
+            
         }
 		#region HangHoa_KhachHang
 
 		public IActionResult Index(int? loai)
         {
             var hangHoas = db.HangHoas.AsQueryable();
-           
 
-           
+          
+
             if (loai.HasValue)
             {
                 hangHoas = hangHoas.Where(p => p.MaLoai == loai.Value);
@@ -38,9 +49,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 MoTaNgan = p.MoTaDonVi ?? "",
                 TenLoai = p.MaLoaiNavigation.TenLoai
             });
-            
+
             return View(result);
-           
+
         }
         
         public IActionResult Search (string? query)
@@ -93,18 +104,132 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
         #region HangHoa_Admin
 
-        /*[HttpGet]
-		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
-		public IActionResult AdminGet(int? loai, string? query)
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        public IActionResult AdminGet(int? loai, string? query)
         {
-            var result=new List<HangHoaVM> ();
-            if (loai.HasValue)
+           /* try
             {
+                IEnumerable<MenuLoaiVM> dataLoai = _loaiHangHoaService.GetAll(null).Select(l=>_mapper.Map<MenuLoaiVM>(l));               
+                TempData["loaiList"] = dataLoai;                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ModelState.AddModelError("loi", "Không thể gọi danh sách loai "); 
+            }
+*/
+            try
+            {
+                IEnumerable<HangHoaModel> data = _hangHoaService.GetAll(loai,query);
+                var result = data.Select(p => _mapper.Map<HangHoaVM_admin>(p));
+                TempData["hangHoaList"] = result;
 
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ModelState.AddModelError("loi", "Không thể gọi danh sách HangHoa ");
+
+                return View();
             }
 
-		}*/
-      
+        }
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        public IActionResult AdminUpdate(HangHoaVM_admin model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                try
+                {
+                    var result = _mapper.Map<HangHoaModel>(model);
+                    _hangHoaService.Update(result);
+                    TempData["Message"] = $"Đã cập nhật Product có id:{model.MaHh} ";
+                    return RedirectToAction("Admin");
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    TempData["Message"] = $"Không thể cập nhật Hàng Hoá có id:{model.MaHh} ";
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData["Message"] = $"Hàng Hoá có id:{model.MaHh}, Dữ liệu cập nhật không phù hợp, ";
+            return RedirectToAction("Index");
+        }
+
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        public IActionResult AdminAdd(HangHoaVM_admin model)
+        {
+            if (ModelState.IsValid)
+            {
+                int count = _hangHoaService.GetAll(null,null).Where(l => l.TenHH == model.TenHH).Count();
+
+
+                if (count > 0)
+                {
+                    TempData["Message"] = @$"Không thể thêm Hang Hoa:'{model.TenLoai}'-Bị trùng tên trong ds hàng hoá";
+                    return RedirectToAction("Index");
+                }
+
+                try
+                {
+                    var result = _mapper.Map<HangHoaModel>(model);
+                    _hangHoaService.Add(result);
+                    TempData["Message"] = $"Đã thêm Hàng Hoá :'{model.TenHH}'";
+                    return RedirectToAction("Index");
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    TempData["Message"] = $"Không thể thêm Hàng Hoá:'{model.TenHH}'";
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData["Message"] = $"Không thể thêm HangHoa: '{model.TenHH}'";
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        public IActionResult AdminDelete(int id)
+        {
+            //List<MenuLoaiVM> result = new List<MenuLoaiVM>();
+            try
+            {
+                _hangHoaService.Delete(id);
+                TempData["Message"] = $"Đã xoá Hàng Hoá có id:{id} ";
+                return RedirectToAction("Index");
+              
+            }
+            catch(ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+                TempData["Message"] = $"Không thể xoá Hàng Hoá có id:\"{id}\"-Không tồn tại ";
+                return RedirectToAction("Index");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine(ex.Message);
+                TempData["Message"] = $"Không thể xoá Hàng Hoá có id:\"{id}\"-Bị ràng buộc dữ liệu ";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                TempData["Message"] = $"Không thể xoá Hàng Hoá có id: {id} ";
+                return RedirectToAction("Index");
+            }
+        }
+
         #endregion
     }
 }

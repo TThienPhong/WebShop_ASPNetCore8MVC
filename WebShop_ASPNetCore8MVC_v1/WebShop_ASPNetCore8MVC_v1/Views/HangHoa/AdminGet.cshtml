@@ -1,19 +1,19 @@
-﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin
 @{
 
-    ViewData["Title"] = "QL_Loai";
-    var loaiMV = new WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM();
+    ViewData["Title"] = "QL_HangHoa";
+    var hangHoaMV = new WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin();
     string message = "";
     if (TempData["Message"] != null)
     {
         message = TempData["Message"].ToString();
 
     }
-    
-    var loaiList = TempData["loaiList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.MenuLoaiVM>();
+
+    var hangHoaList = TempData["hangHoaList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin>();
 }
 
-@section Styles{
+@section Styles {
     <style>
         /* CSS để chia trang thành hai phần */
         .split-container {
@@ -26,13 +26,13 @@
         }
 
 
-        .split-left{
+        .split-left {
             flex: 1;
             overflow-y: auto;
         }
 
         .split-right {
-            flex: 2;
+            flex: 3;
             overflow-y: auto;
         }
 
@@ -40,6 +40,14 @@
             width: 10px;
             cursor: ew-resize;
             background-color: #ccc;
+        }
+        /* CSS để chia trang thành hai phần */
+        .truncate-2-lines {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Số dòng tối đa */
+            -webkit-box-orient: vertical;
         }
     </style>
 
@@ -60,7 +68,7 @@
         <div class="split-container">
             <div class="split-left">
                 <!-- Nội dung bên trái -->
-               
+
                 <div>
                     <th>
                         <tr>
@@ -68,74 +76,30 @@
                         </tr>
                         <tr>
                             <div class="text-danger" asp-validation-summary="All"></div>
-                            <form asp-controller="Loai" asp-action="Index" method="get">
+                            <form asp-controller="HangHoa" asp-action="AdminGet" method="get">
+                                
+
                                 <div class="input-group w-100 mx-auto d-flex">
+                                    <select name="loai" id="cars">
+                                        <option value="" >"Tất cả loại"</option>
+                                        @await Component.InvokeAsync("SelectLoai")
+
+                                    </select>
                                     <input type="search" class="p-2" placeholder="keywords" aria-describedby="searchLoaiButton" name="query" id="searchLoaiText">
-                                    <span id="searchLoaiButton" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                                    <button type="submit" id="searchLoaiButton" class="input-group-text p-3 btn border-secondary py-2 px-3 text-uppercase text-primary"><i class="fa fa-search"></i></button>
                                 </div>
-                            </form>                          
+                            </form>
                         </tr>
                     </th>
 
                     @* -----------------From thêm---------------------- *@
-                    <div class="container py-5 hidden" id="addForm">
-                        <form asp-action="Add" asp-controller="Loai" method="post">
+                    
 
-                            <div>
-                                <h1>Thêm Loại</h1>
-                                <div class="text-danger" asp-validation-summary="All"></div>   
-                                <div class="row">
-                                    <label asp-for="@loaiMV.MaLoai" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@loaiMV.MaLoai" name="MaLoai" readonly class="form-control">
-                                </div>
-                                <div class="row">
-                                    <label asp-for="@loaiMV.TenLoai" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@loaiMV.TenLoai" name="TenLoai" class="form-control">
-                                    <span asp-validation-for="@Model.TenLoai" class="text-danger"></span>
-                                </div>
-                                <div class="row g-4 text-center align-items-center justify-content-center pt-4">
-                                    <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
-
-                                </div>
-                            </div>
-                        </form>
-
-                    </div>
-                   
                     @* -----------------End From thêm---------------------- *@
 
 
                     @* -----------------From sửa---------------------- *@
-                    <div class="container py-5 hidden" id="updateForm">
-
-                        <form asp-action="Update" asp-controller="Loai" method="post" >
-                            <div>
-                                <h1>Sửa Loại</h1>
-                                <div class="text-danger" asp-validation-summary="All"></div>
-                                <div>
-                                    <div class="row">
-                                        <label asp-for="@loaiMV.MaLoai" class="form-label my-3"></label><sup>*</sup>
-                                        <input asp-for="@loaiMV.MaLoai" readonly class="form-control" id="Model_MaLoai" name="MaLoai">
-                                    </div>
-                                    <div class="row">
-                                        <label asp-for="@loaiMV.TenLoai" class="form-label my-3"></label><sup>*</sup>
-                                        <input asp-for="@loaiMV.TenLoai" class="form-control" id="Model_TenLoai" name="TenLoai">
-                                        <span asp-validation-for="@Model.TenLoai" class="text-danger"></span>
-                                    </div>
-                                    <div class="row">
-                                        <label asp-for="@loaiMV.SoLuong" class="form-label my-3"></label><sup>*</sup>
-                                        <input asp-for="@Model.SoLuong" readonly class="form-control" id="Model_SoLuong">
-                                        
-                                    </div>
-                                    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
-                                        <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    
+                   
                     @* -----------------End From sửa---------------------- *@
                 </div>
 
@@ -154,38 +118,55 @@
                     </button>
                 </div>
                 <!----------------------- end Thông báo -->
-                
+
                 <div class="table-responsive">
 
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">Mã Loại</th>
-                                <th scope="col">Tên</th>
-                                <th scope="col">Số Lượng</th>
-
+                                <th scope="col">Hình</th>
+                                <th scope="col">Mã hàng hoá</th>
+                                <th scope="col">Tên hàng hoá</th>
+                                <th scope="col">Tên Loại</th>
+                                
+                                <th scope="col">Giá</th>
+                                <th scope="col">Mô tả ngắn</th>
+                                <th scope="col">Chi tiết</th>
 
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in loaiList)
+                            @foreach (var item in hangHoaList)
                             {
                                 <tr>
+                                    <td>
+                                        <img class="mb-0 mt-4 truncate-2-lines" src="~/Hinh/HangHoa/@item.Hinh" alt="Hình hàng hoá @item.TenHH" style="width: 50px; height: 50px;">
+                                    </td>
 
                                     <td>
-                                        <p class="mb-0 mt-4">@item.MaLoai</p>
+                                        <p class="mb-0 mt-4">@item.MaHh</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.TenHH</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 mt-4">@item.TenLoai</p>
                                     </td>
                                     <td>
-                                        <p class="mb-0 mt-4">@item.SoLuong</p>
+                                        <p class="mb-0 mt-4">@item.DonGia</p>
                                     </td>
                                     <td>
-                                        <button type="button" id="updateLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="UpdateForm('@item.MaLoai', '@item.TenLoai', '@item.SoLuong')">Sửa</button>
+                                        <p class="mb-0 mt-4">@item.MoTaNgan</p>
                                     </td>
                                     <td>
-                                        <a asp-action="Delete" asp-controller="Loai" asp-route-id="@item.MaLoai" id="deleteLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary">Xoá</a>
+                                        <p class="mb-0 mt-4 truncate-2-lines">@item.ChiTiet</p>
+                                    </td>
+
+                                    <td>
+                                        <button type="button" id="updateHangHoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="UpdateForm('@item.MaHh', '@item.TenHH', '@item.MaLoai')">Sửa</button>
+                                    </td>
+                                    <td>
+                                        <a asp-action="AdminDelete" asp-controller="HangHoa" asp-route-id="@item.MaLoai" id="deleteHanghoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary">Xoá</a>
                                     </td>
 
                                 </tr>
@@ -196,9 +177,9 @@
             </div>
         </div>
 
-        
-        
-       
+
+
+
     </div>
 </div>
 <!-- Cart Page End -->
@@ -260,7 +241,7 @@
         };
 
         //----------------Hiển thị thông báo
-        if (@message.Length>0){
+        if (@message.Length> 0) {
             showSuccessMessage();
         }
         else {

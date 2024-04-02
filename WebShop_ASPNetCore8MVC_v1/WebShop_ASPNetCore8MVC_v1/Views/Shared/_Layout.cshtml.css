@@ -46,3 +46,11 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+.truncate-2-lines {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Số dòng tối đa */
+    -webkit-box-orient: vertical;
+}

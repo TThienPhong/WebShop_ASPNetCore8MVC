@@ -1,15 +1,16 @@
 ﻿using WebShop_ASPNetCore8MVC_v1.Data;
-using WebShop_ASPNetCore8MVC_v1.ViewModels;
+using WebShop_ASPNetCore8MVC_v1.Models;
+
 
 namespace WebShop_ASPNetCore8MVC_v1.Services
 {
 	public interface ILoaiHangHoaService
 	{
-		
-		List<MenuLoaiVM> GetAll(string? query);
-		MenuLoaiVM GetById(int loaiHHId);
-		void Add(MenuLoaiVM loaiHH);
-		void Update(MenuLoaiVM loaiHH);
+
+        IEnumerable<LoaiModel> GetAll(string? query);
+        LoaiModel GetById(int loaiHHId);
+		void Add(LoaiModel loaiHH);
+		void Update(LoaiModel loaiHH);
 		void Delete(int loaiHHId);
 	}
 }

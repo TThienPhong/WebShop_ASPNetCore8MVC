@@ -1,6 +1,10 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using WebShop_ASPNetCore8MVC_v1.Data;
+using WebShop_ASPNetCore8MVC_v1.Models;
 using WebShop_ASPNetCore8MVC_v1.Services;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -10,20 +14,23 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 	public class LoaiController : Controller
 	{
 		private readonly ILoaiHangHoaService _loaiService;
+        private readonly IMapper _mapper;
 
-		public LoaiController(ILoaiHangHoaService loaiService) 
+        public LoaiController(ILoaiHangHoaService loaiService,IMapper mapper) 
 		{
 			_loaiService = loaiService;
-		}
+            _mapper = mapper;
+        }
 
 		[HttpGet]
 		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
 		public IActionResult Index(string? query)
 		{
-			List<MenuLoaiVM> result = new List<MenuLoaiVM>();
-			try
+            IEnumerable<MenuLoaiVM> result = new List<MenuLoaiVM>();
+            try
 			{
-                result = _loaiService.GetAll(query);
+                IEnumerable<LoaiModel> data= _loaiService.GetAll(query);
+                result= data.Select(l => _mapper.Map<MenuLoaiVM>(l));
                 TempData["loaiList"] = result;
 
                 return View();
@@ -33,7 +40,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 				Console.WriteLine(ex.Message);
 				ModelState.AddModelError("loi", "Không thể gọi danh sách loại ");
                 
-				return View(result);
+				return View();
 			}			
 		}
 
@@ -41,9 +48,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
 		public IActionResult Delete(int id)
 		{
-			
-
-            List<MenuLoaiVM> result = new List<MenuLoaiVM>();
+            //List<MenuLoaiVM> result = new List<MenuLoaiVM>();
 			try
 			{
                 int count = _loaiService.GetById(id).SoLuong;
@@ -75,7 +80,8 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             MenuLoaiVM result = new MenuLoaiVM();
             try
             {
-                result=_loaiService.GetById(id);
+                result = _mapper.Map<MenuLoaiVM>(_loaiService.GetById(id));
+                   
                 TempData["Message"] = $"{result.MaLoai}-{result.TenLoai} có {result.SoLuong} ";
                 return View();
             }
@@ -92,10 +98,11 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
         {
             if (ModelState.IsValid)
             {
-                MenuLoaiVM result = model;
+                
                 try
                 {
-                    _loaiService.Update(model);
+                    var result = _mapper.Map<LoaiModel>(model);
+                    _loaiService.Update(result);
                     TempData["Message"] = $"Đã cập nhật Loại có id:{model.MaLoai} ";
                     return RedirectToAction("Index");
 
@@ -129,7 +136,8 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
                 try
                 {
-                    _loaiService.Add(model);
+                    var result = _mapper.Map<LoaiModel>(model);
+                    _loaiService.Add(result);
                     TempData["Message"] = $"Đã thêm Loại :'{model.TenLoai}'";
                     return RedirectToAction("Index");
 

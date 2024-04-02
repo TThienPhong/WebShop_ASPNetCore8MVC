@@ -1,8 +1,10 @@
-﻿using Humanizer;
+﻿using AutoMapper;
+using Humanizer;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using WebShop_ASPNetCore8MVC_v1.Data;
+using WebShop_ASPNetCore8MVC_v1.Models;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -11,13 +13,15 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 	public class LoaiHangHoaService : ILoaiHangHoaService
 	{
 		private readonly Hshop2023Context _context;
-
-		public LoaiHangHoaService(Hshop2023Context context)
+        private readonly IMapper _mapper;
+        public LoaiHangHoaService(Hshop2023Context context,IMapper  mapper)
 		{
 			_context = context;
-		}
+			_mapper = mapper;
 
-		public List<MenuLoaiVM> GetAll(string? query)
+        }
+
+		public IEnumerable<LoaiModel> GetAll(string? query)
 		{
 			var data= _context.Loais.AsQueryable();
             #region Filtering
@@ -27,30 +31,42 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
                 bool isNumber = int.TryParse(query, out number);
 
                 data = data.Where(item => item.TenLoai.Contains(query)|| item.MaLoai==number);
-            }          
-            #endregion
+            }
+			#endregion
 
 
-            var result = data.Select(lo => new MenuLoaiVM
+			/*var result = data.Select(lo => new LoaiModel
 			{
 				MaLoai = lo.MaLoai,
 				TenLoai = lo.TenLoai,
 				SoLuong = lo.HangHoas.Count
-			}).OrderBy(i => i.TenLoai);
+			}).OrderBy(i => i.TenLoai);*/
+
+			var result = data.Include(lo=>lo.HangHoas).Select(lo => _mapper.Map<LoaiModel>(lo));
+
+			/*var result=new List<LoaiModel>();
+
+            foreach ( var item in data)
+			{
+				var l = _mapper.Map<LoaiModel>(item);
+				result.Add(l);
+
+            }
+			//result = result.OrderBy(i => i.TenLoai);*/
 
 
-			return result.ToList();
+			return result;
 		}
 
-		public MenuLoaiVM GetById(int loaiHHId)
+		public LoaiModel GetById(int loaiHHId)
 		{
             var loai = _context.Loais
 				.Include(lo => lo.HangHoas) // Include dữ liệu từ bảng HangHoa vào bảng Loais
 				.SingleOrDefault(lo => lo.MaLoai == loaiHHId);
             if (loai != null)
 			{
-				return new MenuLoaiVM
-				{
+				return new LoaiModel
+                {
 					MaLoai = loai.MaLoai,
 					TenLoai = loai.TenLoai,
 					SoLuong=loai.HangHoas.Count,
@@ -58,7 +74,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 			}
 			return null;
 		}
-		public void Add(MenuLoaiVM loaiHH)
+		public void Add(LoaiModel loaiHH)
 		{
 			if (loaiHH == null)
 			{
@@ -68,12 +84,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 			{
                 try
                 {
-					
-                    Loai newLoai = new Loai
-                    {
-                        TenLoai = loaiHH.TenLoai
 
-                    };
+					Loai newLoai = _mapper.Map<Loai>(loaiHH);
+					newLoai.MaLoai = 0;// trong csdl tự tăng
                     _context.Add(newLoai);
                     _context.SaveChanges();
 
@@ -112,22 +125,26 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 		}
 
 
-		public void Update(MenuLoaiVM loaiHH)
+		public void Update(LoaiModel loaiHH)
 		{
 			if (loaiHH == null)
 			{
 				throw new ArgumentNullException(nameof(loaiHH), "cannot be null.");
-			}
-			
-			var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == loaiHH.MaLoai);
-			if (loai != null)
+				return;
+
+            }
+            var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == loaiHH.MaLoai);
+
+            if (loai != null)
 			{
-				loai.TenLoai= loaiHH.TenLoai;
-				_context.SaveChanges();
+                _mapper.Map(loaiHH, loai);
+
+                _context.SaveChanges();
 			}
 			else { 
 				throw new ArgumentException("Loai not found.", nameof(loaiHH)); 
 			}
-		}
+           
+        }
 	}
 }
