@@ -21,8 +21,23 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
 				return string.Empty;
 			}
 		}
+        public static void DeleteHinh(string tenFile, string folder)
+        {
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Hinh", folder, tenFile);
+            try
+            {               
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Không xoá được Hình {fullPath}. " + ex.Message, ex);
+            }
+        }
 
-		public static string GenerateRamdomKey(int length = 5)
+        public static string GenerateRamdomKey(int length = 5)
 		{
 			var pattern = @"qazwsxedcrfvtgbyhnujmiklopQAZWSXEDCRFVTGBYHNUJMIKLOP!";
 			var sb = new StringBuilder();

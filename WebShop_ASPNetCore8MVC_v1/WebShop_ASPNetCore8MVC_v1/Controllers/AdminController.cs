@@ -24,7 +24,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 		}
 		public IActionResult Index()
 		{
-			return View();
+			return RedirectToAction("Profile");
 		}
 
 

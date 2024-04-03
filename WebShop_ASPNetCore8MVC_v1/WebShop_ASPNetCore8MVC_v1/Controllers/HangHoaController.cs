@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using WebShop_ASPNetCore8MVC_v1.Data;
+using WebShop_ASPNetCore8MVC_v1.Helpers;
 using WebShop_ASPNetCore8MVC_v1.Models;
 using WebShop_ASPNetCore8MVC_v1.Services;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
@@ -106,32 +108,24 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
-        public IActionResult AdminGet(int? loai, string? query)
+        public IActionResult AdminGet(int? loai, string? query, HangHoaVM_admin? model)
         {
-           /* try
-            {
-                IEnumerable<MenuLoaiVM> dataLoai = _loaiHangHoaService.GetAll(null).Select(l=>_mapper.Map<MenuLoaiVM>(l));               
-                TempData["loaiList"] = dataLoai;                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                ModelState.AddModelError("loi", "Không thể gọi danh sách loai "); 
-            }
-*/
+
             try
             {
                 IEnumerable<HangHoaModel> data = _hangHoaService.GetAll(loai,query);
                 var result = data.Select(p => _mapper.Map<HangHoaVM_admin>(p));
-                TempData["hangHoaList"] = result;
-
+                //var hangHoaMV = ViewBag.hangHoaMV as HangHoaVM_admin ;
+                ViewBag.isAddError = TempData["isAddError"] as bool? ?? false;
+                ViewBag.hangHoaMV = model;
+                TempData["hangHoaList"] = result;               
                 return View();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 ModelState.AddModelError("loi", "Không thể gọi danh sách HangHoa ");
-
+                TempData["Message"] = $"Không tể gọi danh sách hàng hoá ";
                 return View();
             }
 
@@ -149,53 +143,76 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                     var result = _mapper.Map<HangHoaModel>(model);
                     _hangHoaService.Update(result);
                     TempData["Message"] = $"Đã cập nhật Product có id:{model.MaHh} ";
-                    return RedirectToAction("Admin");
+                    return RedirectToAction("AdminGet");
+
 
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                     TempData["Message"] = $"Không thể cập nhật Hàng Hoá có id:{model.MaHh} ";
-                    return RedirectToAction("Index");
+                    TempData["hangHoaMV"] = model;
+                    return RedirectToAction("AdminGet");
                 }
             }
             TempData["Message"] = $"Hàng Hoá có id:{model.MaHh}, Dữ liệu cập nhật không phù hợp, ";
-            return RedirectToAction("Index");
+            TempData["hangHoaMV"] = model;
+            return RedirectToAction("AdminGet");
         }
 
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
-        public IActionResult AdminAdd(HangHoaVM_admin model)
+        public IActionResult AdminAdd(HangHoaVM_admin model, IFormFile Hinh)
         {
+
+            if (Hinh == null)
+            {
+                TempData["Message"] = @$"Không thể thêm Hang Hoa:'{model.TenLoai}'-Bị thiếu hình ";
+                TempData["isAddError"] = true;
+                ModelState.AddModelError(nameof(model.Hinh), "Vui lòng chọn Hình");
+                return RedirectToAction("AdminGet", model);
+
+            }
             if (ModelState.IsValid)
             {
+
+
                 int count = _hangHoaService.GetAll(null,null).Where(l => l.TenHH == model.TenHH).Count();
 
 
                 if (count > 0)
                 {
                     TempData["Message"] = @$"Không thể thêm Hang Hoa:'{model.TenLoai}'-Bị trùng tên trong ds hàng hoá";
-                    return RedirectToAction("Index");
+                    TempData["isAddError"] = true;
+                    return RedirectToAction("AdminGet", model);
                 }
 
                 try
                 {
                     var result = _mapper.Map<HangHoaModel>(model);
+                    result.Hinh = MyUtil.UploadHinh(Hinh, "HangHoa");// chưa sử lý hình trùng tên
                     _hangHoaService.Add(result);
+                    TempData["isAddError"] = false;
                     TempData["Message"] = $"Đã thêm Hàng Hoá :'{model.TenHH}'";
-                    return RedirectToAction("Index");
+                    
+
+
+                    return RedirectToAction("AdminGet", model);
 
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                     TempData["Message"] = $"Không thể thêm Hàng Hoá:'{model.TenHH}'";
-                    return RedirectToAction("Index");
+                    TempData["isAddError"] = true;
+                    return RedirectToAction("AdminGet", model);
                 }
             }
-            TempData["Message"] = $"Không thể thêm HangHoa: '{model.TenHH}'";
-            return RedirectToAction("Index");
+            TempData["Message"] = $"Không thể thêm HangHoa: '{model.TenHH}'-Dữ liệu không phù hợp";
+            TempData["isAddError"] = true;
+           
+            return RedirectToAction("AdminGet", model);
         }
 
         [HttpGet]
@@ -205,28 +222,30 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             //List<MenuLoaiVM> result = new List<MenuLoaiVM>();
             try
             {
+                var result = _hangHoaService.GetById(id);
+                MyUtil.DeleteHinh(result.Hinh, "HangHoa");
                 _hangHoaService.Delete(id);
                 TempData["Message"] = $"Đã xoá Hàng Hoá có id:{id} ";
-                return RedirectToAction("Index");
+                return RedirectToAction("AdminGet");
               
             }
             catch(ArgumentException ex)
             {
                 Console.WriteLine(ex.Message);
                 TempData["Message"] = $"Không thể xoá Hàng Hoá có id:\"{id}\"-Không tồn tại ";
-                return RedirectToAction("Index");
+                return RedirectToAction("AdminGet");
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine(ex.Message);
                 TempData["Message"] = $"Không thể xoá Hàng Hoá có id:\"{id}\"-Bị ràng buộc dữ liệu ";
-                return RedirectToAction("Index");
+                return RedirectToAction("AdminGet");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 TempData["Message"] = $"Không thể xoá Hàng Hoá có id: {id} ";
-                return RedirectToAction("Index");
+                return RedirectToAction("AdminGet");
             }
         }
 

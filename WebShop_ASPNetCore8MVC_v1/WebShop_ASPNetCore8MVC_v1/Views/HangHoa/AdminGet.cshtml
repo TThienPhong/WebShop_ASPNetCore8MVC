@@ -1,16 +1,17 @@
 ﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin
 @{
-
+   
     ViewData["Title"] = "QL_HangHoa";
-    var hangHoaMV = new WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin();
-    string message = "";
-    if (TempData["Message"] != null)
-    {
-        message = TempData["Message"].ToString();
+    var hangHoaMV = ViewBag.hangHoaMV as WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin ?? new WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin();
 
-    }
+    var message = TempData["Message"] as string ??"";
+    var isAddError = ViewBag.isAddError as bool? ?? false;
+  
 
+    var isUpdateError = TempData["isUpdateError"] ?? false;
     var hangHoaList = TempData["hangHoaList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin>();
+
+    
 }
 
 @section Styles {
@@ -75,7 +76,7 @@
                             <button id="createLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="AddForm()">Thêm mới</button>
                         </tr>
                         <tr>
-                            <div class="text-danger" asp-validation-summary="All"></div>
+                            @*<div class="text-danger" asp-validation-summary="All"></div>*@
                             <form asp-controller="HangHoa" asp-action="AdminGet" method="get">
                                 
 
@@ -93,13 +94,114 @@
                     </th>
 
                     @* -----------------From thêm---------------------- *@
+                    <div class="container py-5 hidden" id="addForm">
+                        <form asp-action="AdminAdd" asp-controller="HangHoa" method="post" enctype="multipart/form-data" >
+
+                            <div>
+                                <h1>Thêm Hàng Hoá</h1>
+                                <div class="text-danger" asp-validation-summary="All"></div>
+                                <div class="row">
+                                    <label asp-for="@Model.MaHh" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.MaHh" value="0" readonly class="form-control" id="Model_MaHh">
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.TenHH" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.TenHH" class="form-control" id="Model_TenHH">
+                                    <span asp-validation-for="@Model.TenHH" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.MaLoai" class="form-label my-3"></label><sup>*</sup>
+                                    <select label asp-for="@Model.MaLoai" id="Model_MaLoai" class="form-control">
+                                        @await Component.InvokeAsync("SelectLoai")
+
+                                    </select>
+                                    <span asp-validation-for="@Model.MaLoai" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.DonGia" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.DonGia" class="form-control" id="Model_DonGia">
+                                    <span asp-validation-for="@Model.DonGia" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.MoTaNgan" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.MoTaNgan" class="form-control" id="Model_MoTaNgan">
+                                    <span asp-validation-for="@Model.MoTaNgan" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.ChiTiet" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.ChiTiet" class="form-control" id="Model_ChiTiet">
+                                    <span asp-validation-for="@Model.ChiTiet" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label class="form-label my-3" for="Hinh">Hình</label>
+                                    <input type="file" name="Hinh" class="form-control" />
+                                    <span asp-validation-for="@Model.Hinh" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
+
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
                     
 
                     @* -----------------End From thêm---------------------- *@
 
 
                     @* -----------------From sửa---------------------- *@
-                   
+                    <div class="container py-5 hidden" id="updateForm">
+                        <form asp-action="AdminAdd" asp-controller="HangHoa" method="post" enctype="multipart/form-data">
+
+                            <div>
+                                <h1>Thêm Loại</h1>
+                                <div class="text-danger" asp-validation-summary="All"></div>
+                                <div class="row">
+                                    <label asp-for="@hangHoaMV.MaHh" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@hangHoaMV.MaHh" name="MaHh"  readonly class="form-control" id="Model_MaHh">
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@hangHoaMV.TenHH" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@hangHoaMV.TenHH" name="TenHH" class="form-control" id="Model_TenHH">
+                                    <span asp-validation-for="@hangHoaMV.TenHH" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@hangHoaMV.MaLoai" class="form-label my-3"></label><sup>*</sup>
+                                    <select name="MaLoai" class="form-control" id="Model_MaLoai">
+                                        @await Component.InvokeAsync("SelectLoai")
+
+                                    </select>
+                                    <span asp-validation-for="@hangHoaMV.MaLoai" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@hangHoaMV.DonGia" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@hangHoaMV.DonGia" name="DonGia" class="form-control" id="Model_DonGia">
+                                    <span asp-validation-for="@hangHoaMV.DonGia" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@hangHoaMV.MoTaNgan" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@hangHoaMV.MoTaNgan" name="MoTaNgan" class="form-control" id="Model_MoTaNgan">
+                                    <span asp-validation-for="@hangHoaMV.MoTaNgan" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@hangHoaMV.ChiTiet" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@hangHoaMV.ChiTiet" name="ChiTiet" class="form-control" id="Model_ChiTiet">
+                                    <span asp-validation-for="@hangHoaMV.ChiTiet" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label class="form-label my-3" for="Hinh">Hình</label>
+                                    <input type="file" name="hinh" class="form-control" />
+                                    <span asp-validation-for="@hangHoaMV.Hinh" class="text-danger"></span>
+                                </div>
+                                <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                                    <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
+
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
                     @* -----------------End From sửa---------------------- *@
                 </div>
 
@@ -166,10 +268,10 @@
                                         <button type="button" id="updateHangHoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="UpdateForm('@item.MaHh', '@item.TenHH', '@item.MaLoai')">Sửa</button>
                                     </td>
                                     <td>
-                                        <a asp-action="AdminDelete" asp-controller="HangHoa" asp-route-id="@item.MaLoai" id="deleteHanghoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary">Xoá</a>
+                                        <a asp-action="AdminDelete" asp-controller="HangHoa" asp-route-id="@item.MaHh" id="deleteHanghoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary">Xoá</a>
                                     </td>
 
-                                </tr>
+                               </tr>
                             }
                         </tbody>
                     </table>
@@ -183,6 +285,36 @@
     </div>
 </div>
 <!-- Cart Page End -->
+
+
+@if (isAddError)
+{
+<script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const addForm = document.getElementById('addForm');
+            const updateForm = document.getElementById('updateForm');
+
+            // Ẩn hoặc hiển thị form tùy thuộc vào trạng thái hiện tại của form1
+            updateForm.classList.add('hidden');
+            addForm.classList.remove('hidden');
+
+            var MaHh = 0;
+            var TenHH = @Json.Serialize(hangHoaMV.TenHH);
+            var MaLoai = @Json.Serialize(hangHoaMV.MaLoai);
+            var DonGia = @Json.Serialize(hangHoaMV.DonGia);
+            var MoTaNgan = @Json.Serialize(hangHoaMV.MoTaNgan);
+            var ChiTiet = @Json.Serialize(hangHoaMV.ChiTiet);
+
+            document.getElementById('Model_MaHh').value = MaHh;
+            document.getElementById('Model_TenHH').value = TenHH;
+            document.getElementById('Model_MaLoai').value = MaLoai;
+            document.getElementById('Model_DonGia').value = DonGia;
+            document.getElementById('Model_MoTaNgan').value = MoTaNgan;
+            document.getElementById('Model_ChiTiet').value = ChiTiet;
+        });
+</script>
+}
+
 @section Scripts {
     <script>
         // JavaScript để cho phép kéo thu phóng
@@ -241,7 +373,8 @@
         };
 
         //----------------Hiển thị thông báo
-        if (@message.Length> 0) {
+      
+        if (@message.Length >0) {
             showSuccessMessage();
         }
         else {

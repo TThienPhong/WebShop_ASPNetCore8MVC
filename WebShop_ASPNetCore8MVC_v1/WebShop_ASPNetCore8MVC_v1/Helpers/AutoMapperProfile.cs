@@ -51,7 +51,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
                 .ForMember(dest => dest.LoaiHH, opt => opt.MapFrom(src => new LoaiModel
                 {
                     MaLoai = src.MaLoai,
-                    TenLoai = src.TenLoai
+                    TenLoai = src.TenLoai??""
                 }));
             //---------------------------------------------------------
             CreateMap<Loai, LoaiModel>()
@@ -60,7 +60,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
             CreateMap<HangHoaModel, HangHoa>()
                .ForMember(dest => dest.MoTa, opt => opt.MapFrom(src => src.ChiTiet ?? ""))
                .ForMember(dest => dest.MoTaDonVi, opt => opt.MapFrom(src => src.MoTaNgan ?? ""))
-               .ForMember(dest => dest.MaLoaiNavigation, opt => opt.MapFrom(src => src.LoaiHH));
+               .ForMember(dest => dest.MaLoai, opt => opt.MapFrom(src => src.LoaiHH.MaLoai));
 
             //.ReverseMap(); // Cho phép ánh xạ ngược từ HangHoaVM sang HangHoaModel
             CreateMap<HangHoa, HangHoaModel>()
