@@ -133,14 +133,35 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
-        public IActionResult AdminUpdate(HangHoaVM_admin model)
+        public IActionResult AdminUpdate(HangHoaVM_admin model, IFormFile? Hinh)
         {
             if (ModelState.IsValid)
             {
-
+                var hh = _hangHoaService.GetById(model.MaHh);
+                if (hh == null)
+                {
+                    TempData["Message"] = $"không tồn tại Hàng hoá có id:{model.MaHh}";
+                    return RedirectToAction("AdminGet");
+                }
+               
                 try
                 {
+                   
                     var result = _mapper.Map<HangHoaModel>(model);
+
+                    
+                    if (Hinh != null)
+                    {
+                        MyUtil.DeleteHinh(hh.Hinh, "HangHoa");
+                        result.Hinh = MyUtil.UploadHinh(Hinh, "HangHoa");
+
+                    }
+                    else
+                    {
+                        result.Hinh = hh.Hinh;
+                    }
+                  
+                 
                     _hangHoaService.Update(result);
                     TempData["Message"] = $"Đã cập nhật Product có id:{model.MaHh} ";
                     return RedirectToAction("AdminGet");
@@ -150,8 +171,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    TempData["Message"] = $"Không thể cập nhật Hàng Hoá có id:{model.MaHh} ";
-                    TempData["hangHoaMV"] = model;
+                    TempData["Message"] = $"Không thể cập nhật Hàng Hoá có id:{model.MaHh} ";             
                     return RedirectToAction("AdminGet");
                 }
             }

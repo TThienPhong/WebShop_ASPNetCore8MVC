@@ -148,7 +148,9 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
             {
                 try
                 {
+                    
                     _mapper.Map(product,hanghoa);
+
                     _context.SaveChanges();
                 }
                 catch (Exception ex)

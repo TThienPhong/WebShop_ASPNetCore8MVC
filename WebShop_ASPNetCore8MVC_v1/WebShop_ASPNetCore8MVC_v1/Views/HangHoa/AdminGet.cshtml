@@ -134,7 +134,7 @@
                                 </div>
                                 <div class="row">
                                     <label class="form-label my-3" for="Hinh">Hình</label>
-                                    <input type="file" name="Hinh" class="form-control" />
+                                    <input type="file" name="Hinh" class="form-control" accept="image/*"  />
                                     <span asp-validation-for="@Model.Hinh" class="text-danger"></span>
                                 </div>
                                 <div class="row">
@@ -152,49 +152,49 @@
 
                     @* -----------------From sửa---------------------- *@
                     <div class="container py-5 hidden" id="updateForm">
-                        <form asp-action="AdminAdd" asp-controller="HangHoa" method="post" enctype="multipart/form-data">
+                        <form asp-action="AdminUpdate" asp-controller="HangHoa" method="post" enctype="multipart/form-data">
 
                             <div>
-                                <h1>Thêm Loại</h1>
+                                <h1>Sửa Hàng Hoá</h1>
                                 <div class="text-danger" asp-validation-summary="All"></div>
                                 <div class="row">
-                                    <label asp-for="@hangHoaMV.MaHh" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@hangHoaMV.MaHh" name="MaHh"  readonly class="form-control" id="Model_MaHh">
+                                    <label asp-for="@Model.MaHh" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.MaHh" value="0" readonly class="form-control" id="Update_MaHh">
                                 </div>
                                 <div class="row">
-                                    <label asp-for="@hangHoaMV.TenHH" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@hangHoaMV.TenHH" name="TenHH" class="form-control" id="Model_TenHH">
-                                    <span asp-validation-for="@hangHoaMV.TenHH" class="text-danger"></span>
+                                    <label asp-for="@Model.TenHH" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.TenHH" class="form-control" id="Update_TenHH">
+                                    <span asp-validation-for="@Model.TenHH" class="text-danger"></span>
                                 </div>
                                 <div class="row">
-                                    <label asp-for="@hangHoaMV.MaLoai" class="form-label my-3"></label><sup>*</sup>
-                                    <select name="MaLoai" class="form-control" id="Model_MaLoai">
+                                    <label asp-for="@Model.MaLoai" class="form-label my-3"></label><sup>*</sup>
+                                    <select label asp-for="@Model.MaLoai" id="Update_MaLoai" class="form-control">
                                         @await Component.InvokeAsync("SelectLoai")
 
                                     </select>
-                                    <span asp-validation-for="@hangHoaMV.MaLoai" class="text-danger"></span>
+                                    <span asp-validation-for="@Model.MaLoai" class="text-danger"></span>
                                 </div>
                                 <div class="row">
-                                    <label asp-for="@hangHoaMV.DonGia" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@hangHoaMV.DonGia" name="DonGia" class="form-control" id="Model_DonGia">
-                                    <span asp-validation-for="@hangHoaMV.DonGia" class="text-danger"></span>
+                                    <label asp-for="@Model.DonGia" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.DonGia" class="form-control" id="Update_DonGia">
+                                    <span asp-validation-for="@Model.DonGia" class="text-danger"></span>
                                 </div>
                                 <div class="row">
-                                    <label asp-for="@hangHoaMV.MoTaNgan" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@hangHoaMV.MoTaNgan" name="MoTaNgan" class="form-control" id="Model_MoTaNgan">
-                                    <span asp-validation-for="@hangHoaMV.MoTaNgan" class="text-danger"></span>
+                                    <label asp-for="@Model.MoTaNgan" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.MoTaNgan" class="form-control" id="Update_MoTaNgan">
+                                    <span asp-validation-for="@Model.MoTaNgan" class="text-danger"></span>
                                 </div>
                                 <div class="row">
-                                    <label asp-for="@hangHoaMV.ChiTiet" class="form-label my-3"></label><sup>*</sup>
-                                    <input asp-for="@hangHoaMV.ChiTiet" name="ChiTiet" class="form-control" id="Model_ChiTiet">
-                                    <span asp-validation-for="@hangHoaMV.ChiTiet" class="text-danger"></span>
+                                    <label asp-for="@Model.ChiTiet" class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@Model.ChiTiet" class="form-control" id="Update_ChiTiet">
+                                    <span asp-validation-for="@Model.ChiTiet" class="text-danger"></span>
                                 </div>
                                 <div class="row">
                                     <label class="form-label my-3" for="Hinh">Hình</label>
-                                    <input type="file" name="hinh" class="form-control" />
-                                    <span asp-validation-for="@hangHoaMV.Hinh" class="text-danger"></span>
+                                    <input type="file" name="Hinh" class="form-control" accept="image/*"/>
+                                    <span asp-validation-for="@Model.Hinh" class="text-danger"></span>
                                 </div>
-                                <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                                <div class="row">
                                     <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
 
                                 </div>
@@ -265,7 +265,7 @@
                                     </td>
 
                                     <td>
-                                        <button type="button" id="updateHangHoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="UpdateForm('@item.MaHh', '@item.TenHH', '@item.MaLoai')">Sửa</button>
+                                        <button type="button" id="updateHangHoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="UpdateForm('@item.MaHh', '@item.TenHH', '@item.MaLoai','@item.DonGia', '@item.MoTaNgan','@item.ChiTiet')">Sửa</button>
                                     </td>
                                     <td>
                                         <a asp-action="AdminDelete" asp-controller="HangHoa" asp-route-id="@item.MaHh" id="deleteHanghoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary">Xoá</a>
@@ -352,7 +352,8 @@
             updateForm.classList.add('hidden');
             addForm.classList.remove('hidden');
         };
-        function UpdateForm(maLoai, tenLoai, soLuong) {
+
+        function UpdateForm(MaHh, TenHH, MaLoai,DonGia,MoTaNgan,ChiTiet) {
             const addForm = document.getElementById('addForm');
             const updateForm = document.getElementById('updateForm');
 
@@ -363,13 +364,16 @@
             addForm.classList.add('hidden');
             updateForm.classList.remove('hidden');
 
-            console.log("Sửa thông tin cho mục có mã loại là: " + maLoai);
-            console.log("Tên loại: " + tenLoai);
-            console.log("Số lượng: " + soLuong);
+            console.log("Sửa thông tin cho mục mã HH là: " + MaHh);
+            console.log("Tên HH: " + TenHH);
+            console.log("Giá: " + DonGia);
 
-            $("#Model_MaLoai").val(maLoai);
-            $("#Model_TenLoai").val(tenLoai);
-            $("#Model_SoLuong").val(soLuong);
+            document.getElementById('Update_MaHh').value = MaHh;
+            document.getElementById('Update_TenHH').value = TenHH;
+            document.getElementById('Update_MaLoai').value = MaLoai;
+            document.getElementById('Update_DonGia').value = DonGia;
+            document.getElementById('Update_MoTaNgan').value = MoTaNgan;
+            document.getElementById('Update_ChiTiet').value = ChiTiet;
         };
 
         //----------------Hiển thị thông báo
