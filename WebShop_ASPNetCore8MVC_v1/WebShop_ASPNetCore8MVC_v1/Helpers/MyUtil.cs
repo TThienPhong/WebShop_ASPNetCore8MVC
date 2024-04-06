@@ -9,12 +9,16 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
 			try
 			{
 
-				var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Hinh", folder, Hinh.FileName);
-				using (var myfile = new FileStream(fullPath, FileMode.CreateNew))
+                // var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Hinh", folder, Hinh.FileName);
+                string fileExtension = Path.GetExtension(Hinh.FileName);
+                Guid guid = Guid.NewGuid();
+                string fileName = guid.ToString()+ fileExtension;
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Hinh", folder, fileName);
+                using (var myfile = new FileStream(fullPath, FileMode.CreateNew))
 				{
 					Hinh.CopyTo(myfile);
 				}
-				return Hinh.FileName;
+				return fileName;
 			}
 			catch (Exception ex)
 			{

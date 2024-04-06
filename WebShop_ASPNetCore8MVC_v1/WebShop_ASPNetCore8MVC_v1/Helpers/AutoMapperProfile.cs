@@ -17,8 +17,8 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
             Hshop2023Context _dbContext=new Hshop2023Context();
 
             CreateMap<RegisterVM, KhachHangModel>()
-             .ForMember(dest => dest.RandomKey, opt => opt.MapFrom(src =>  MyUtil.GenerateRamdomKey(5)))
-             .ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src,dest) => src.MatKhau.ToMd5Hash(dest.RandomKey)))
+             .ForMember(dest => dest.RandomKey, opt => opt.MapFrom(src => MyUtil.GenerateRamdomKey(5)))
+             /*.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src,dest) => src.MatKhau.ToMd5Hash(dest.RandomKey)))*/
              .ForMember(dest => dest.HieuLuc, opt => opt.MapFrom(src => true))
              .ForMember(dest => dest.VaiTro, opt => opt.MapFrom(src => 0))
              .AfterMap((src, dest) => dest.MatKhau = src.MatKhau.ToMd5Hash(dest.RandomKey));

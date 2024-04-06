@@ -1,7 +1,7 @@
-﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.RegisterVM
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.RegisterVM;
 @using System.Security.Claims;
 @{
-    
+
     ViewData["Title"] = "Profile";
 
     var message = TempData["Message"] as string ?? "";
@@ -9,14 +9,14 @@
 
 
     var isUpdateError = TempData["isUpdateError"] as bool? ?? false;
-   
+
 }
-@section Styles{
+@section Styles {
     <style>
         /* Để chỉnh sửa kích thước của hình ảnh */
         .avatar {
-            max-width: 100px;
-            max-height: 100px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             object-fit: cover;
             border: 5px solid #fff;
@@ -26,10 +26,10 @@
         /* Để căn chỉnh hình ảnh sang bên phải */
         .profile-image {
             float: right;
-             /* Khoảng cách giữa hình ảnh và nội dung */
+            /* Khoảng cách giữa hình ảnh và nội dung */
         }
 
-        /* Để xóa các đặc tính của thẻ <div> chứa hình ảnh */
+        /* Để xóa các đặc tính của thẻ div chứa hình ảnh */
         .profile-image-container {
             overflow: hidden; /* Đảm bảo không có phần của hình ảnh vượt ra khỏi phần tử chứa */
             margin-left: 20px;
@@ -38,48 +38,103 @@
 }
 
 <div class="container-fluid py-5 mt-5">
+
     <div class="container">
+        <h2>Welcome @Model.HoTen (@Context.User.Identity.Name) </h2>
         <div class="row">
-            <div class="col-md-3 bg-primary">
-                <!-- Nội dung bên trái -->
-
-                <p>Bênh trái Bênh trái Bênh trái Bênh trái Bênh trái Bênh trái Bênh trái </p>
-
-            </div>
-
             <div class="col-md-9">
-                <!-- Nội dung bên phải -->
-                <p>Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải  </p>
-
-            </div>
-
-        </div>
-    
-        
-        <div class="row">
-
-            <div class="col-md-6">
-            <form action="/" method="post">
-            
-            </form>
-                <p> Tên:			@Context.User.FindFirstValue(ClaimTypes.Name);</p>
+                <!-- Nội dung bên trái -->
+                <p> Tên (ban đầu):			@Context.User.FindFirstValue(ClaimTypes.Name);</p>
                 <p> Tên Đăng Nhập:	@Context.User.FindFirstValue("CustomerID")</p>
-                <p> Email:			@Context.User.FindFirstValue(ClaimTypes.Email);</p>
+                <p> Email (ban đầu):			@Context.User.FindFirstValue(ClaimTypes.Email);</p>
+
+                <p> Địa chỉ :	    @Model.DiaChi</p>
+                <p> Số ĐT:			@Model.DienThoai;</p>                
                 <a asp-action="DangXuat">Đăng xuất</a>
 
-
-                <p> Địa chỉ :	@Model.DiaChi</p>
-                <p> Số ĐT:			@Model.DienThoai;</p>
+               
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
+                <!-- Nội dung bên phai -->
                 <div class="profile-image-container">
                     <div>
                         <img src="~/Hinh/KhachHang/@Model.Hinh" alt="User Avatar" class="avatar">
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-   
 
+            </div>
+
+        </div>
+
+    </div>
+    <div class="container" id="updateForm">
+        <form asp-action="Update" asp-controller="KhachHang" method="post" enctype="multipart/form-data">
+            <div>
+
+                <div class="text-danger" asp-validation-summary="All"></div>
+                <div class="text-danger">@message</div>
+                <div class="row">
+                    <label asp-for="@Model.MaKh" class="form-label my-3"></label><sup>*</sup>
+                    <input asp-for="@Model.MaKh" readonly class="form-control">
+                    <span asp-validation-for="@Model.MaKh" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <label asp-for="@Model.HoTen" class="form-label my-3"></label><sup>*</sup>
+                    <input asp-for="@Model.HoTen" class="form-control">
+                    <span asp-validation-for="@Model.HoTen" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <label asp-for="@Model.MatKhau" class="form-label my-3"></label><sup>(Cần nhập mật khẩu đã sử dụng để xác nhận)</sup>
+                    <input asp-for="@Model.MatKhau" class="form-control">
+                    <span asp-validation-for="@Model.MatKhau" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <label class="form-label my-3" asp-for="@Model.GioiTinh"></label><sup>*</sup>
+                    <div class="form-control">
+                        <input asp-for="@Model.GioiTinh" type="radio" value="True" checked>Nam
+                        <span>  </span>
+                        <input asp-for="@Model.GioiTinh" type="radio" value="False">Nữ
+                    </div>
+
+                    <span asp-validation-for="@Model.GioiTinh" class="text-danger"></span>
+                </div>
+
+
+                <div class="row">
+                    <label asp-for="@Model.Email" class="form-label my-3"></label><sup>*</sup>
+                    <input asp-for="@Model.Email" class="form-control">
+                    <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <label asp-for="@Model.DienThoai" class="form-label my-3"></label><sup>*</sup>
+                    <input asp-for="@Model.DienThoai" class="form-control">
+                    <span asp-validation-for="@Model.DienThoai" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <label asp-for="@Model.DiaChi" class="form-label my-3"></label><sup>*</sup>
+                    <input asp-for="@Model.DiaChi" class="form-control">
+                    <span asp-validation-for="@Model.DiaChi" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <label asp-for="@Model.NgaySinh" class="form-label my-3"></label><sup>*</sup>
+                    <input asp-for="@Model.NgaySinh" class="form-control">
+                    <span asp-validation-for="@Model.NgaySinh" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <label class="form-label my-3" for="Hinh">Hình</label>
+                    <input type="file" name="Hinh" class="form-control" accept="image/*" />
+                    <span asp-validation-for="@Model.Hinh" class="text-danger"></span>
+                </div>
+                <div class="row">
+                    <span> &nbsp;</span>
+
+                    <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Save</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
+

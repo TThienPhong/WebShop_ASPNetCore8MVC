@@ -9,6 +9,8 @@ using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using WebShop_ASPNetCore8MVC_v1.Services;
+using WebShop_ASPNetCore8MVC_v1.Models;
+
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
@@ -184,8 +186,67 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
             //var kh = _mapper.Map<RegisterVM>();
             return View(kh);
 		}
-		
-		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme,Cookies")]//nếu chưa đăng nhập chỉ đến Cookies
+
+        [Authorize]
+        public IActionResult Update(RegisterVM khachHang,IFormFile? Hinh)
+        {
+            string maKH = User.FindFirstValue("CustomerID") ?? "";
+            if (string.IsNullOrEmpty(maKH))
+            {
+                ModelState.AddModelError("loi", "Đăng nhập để xem thông tinh của mình");
+                return Redirect("/");
+
+            }
+            var khM = _khachHangService.GetById(maKH);
+            if (khM == null)
+            {
+                ModelState.AddModelError("loi", "Khách hàng không tồn tại trong hệ thống");
+                return Redirect("/");
+
+            }
+
+            if(khachHang==null)
+            {
+                ModelState.AddModelError("loi", "Cần xem lại thông tin cập nhật");
+                return Redirect("/");
+            }
+            if(ModelState.IsValid)
+            {
+                if (khachHang.MaKh != maKH)
+                {
+                    ModelState.AddModelError("loi", "Chỉ được cập nhật thông tin của mình");
+                    return Redirect("/");
+                }
+                if (khachHang.MatKhau.ToMd5Hash(khM.RandomKey) != khM.MatKhau)
+                {
+                    ModelState.AddModelError("loi", "Mật khẩu xác nhận không chính xác");
+                    return RedirectToAction("Profile", khachHang);
+                }
+                if (Hinh != null)
+                {
+                    if (khM.Hinh != "avatarNull.jpg" && !string.IsNullOrEmpty(khM.Hinh))
+                    { MyUtil.DeleteHinh(khM.Hinh, "KhachHang"); }
+
+                    khachHang.Hinh = MyUtil.UploadHinh(Hinh, "KhachHang");
+
+                }
+                else
+                {
+                    khachHang.Hinh = khM.Hinh;
+                }
+
+                _khachHangService.Update(_mapper.Map<KhachHangModel>(khachHang));
+                TempData["Message"] = "Cập nhật thông tin thành công";
+                //var kh = _mapper.Map<RegisterVM>();
+                return RedirectToAction("Profile", khachHang);
+            }
+            TempData["Message"] = "Không thể cập nhật thông tin";
+            //var kh = _mapper.Map<RegisterVM>();
+            return RedirectToAction("Profile", khachHang);
+
+        }
+
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme,Cookies")]//nếu chưa đăng nhập chỉ đến Cookies
 		public IActionResult ProfileKhachOrAdmin()
 		{
 			return View();
@@ -197,9 +258,6 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 			await HttpContext.SignOutAsync();
 			return Redirect("/");
 		}
-
-
-
 
 	}
 }
