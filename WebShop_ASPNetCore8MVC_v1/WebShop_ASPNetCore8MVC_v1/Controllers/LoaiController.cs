@@ -11,7 +11,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
-	public class LoaiController : Controller
+    public class LoaiController : Controller
 	{
 		private readonly ILoaiHangHoaService _loaiService;
         private readonly IMapper _mapper;

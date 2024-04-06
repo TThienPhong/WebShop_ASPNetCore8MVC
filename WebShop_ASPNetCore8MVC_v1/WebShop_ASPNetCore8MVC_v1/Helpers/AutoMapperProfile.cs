@@ -4,6 +4,7 @@ using System.ComponentModel.Design;
 using WebShop_ASPNetCore8MVC_v1.Data;
 using WebShop_ASPNetCore8MVC_v1.Models;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
+//using WebShop_ASPNetCore8MVC_v1.Helpers;
 
 namespace WebShop_ASPNetCore8MVC_v1.Helpers
 {
@@ -14,10 +15,23 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
 		{
             
             Hshop2023Context _dbContext=new Hshop2023Context();
-            CreateMap<RegisterVM, KhachHang>();
+
+            CreateMap<RegisterVM, KhachHangModel>()
+             .ForMember(dest => dest.RandomKey, opt => opt.MapFrom(src =>  MyUtil.GenerateRamdomKey(5)))
+             .ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src,dest) => src.MatKhau.ToMd5Hash(dest.RandomKey)))
+             .ForMember(dest => dest.HieuLuc, opt => opt.MapFrom(src => true))
+             .ForMember(dest => dest.VaiTro, opt => opt.MapFrom(src => 0))
+             .AfterMap((src, dest) => dest.MatKhau = src.MatKhau.ToMd5Hash(dest.RandomKey));
+
+
+            CreateMap<KhachHangModel, RegisterVM>()
+             .ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src) => "12345"));
+            
+
+
             //.ForMember(kh => kh.HoTen, option => option.MapFrom(RegisterVM => RegisterVM.HoTen))
             //.ReverseMap();
-           
+
             CreateMap<MenuLoaiVM, LoaiModel>()
 			.ReverseMap();
 
@@ -54,6 +68,10 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
                     TenLoai = src.TenLoai??""
                 }));
             //---------------------------------------------------------
+
+            CreateMap<KhachHangModel, KhachHang>();
+            CreateMap<KhachHang, KhachHangModel>();
+
             CreateMap<Loai, LoaiModel>()
                 .ForMember(dest => dest.SoLuong, opt => opt.MapFrom(src => src.HangHoas.Count));
             CreateMap<LoaiModel, Loai>();

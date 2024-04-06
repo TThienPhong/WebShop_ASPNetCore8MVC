@@ -8,6 +8,7 @@ using WebShop_ASPNetCore8MVC_v1.Helpers;
 using WebShop_ASPNetCore8MVC_v1.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using WebShop_ASPNetCore8MVC_v1.Services;
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
 {
@@ -15,14 +16,16 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
     {
 		private readonly Hshop2023Context db;
 		private readonly IMapper _mapper;
-		
+        private readonly IKhachHangService _khachHangService;
 
-		public KhachHangController(Hshop2023Context context, IMapper mapper)
+        public KhachHangController(Hshop2023Context context, IMapper mapper,IKhachHangService khachHangService)
 		{
 			db = context;
 			_mapper = mapper;
-			
-		}
+			_khachHangService = khachHangService;
+
+
+        }
 
         #region  Register
 
@@ -57,12 +60,12 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 try
                 {
                     var khachHang = _mapper.Map<KhachHang>(model);
-                    khachHang.RandomKey = MyUtil.GenerateRamdomKey();
-                    khachHang.MatKhau = model.MatKhau.ToMd5Hash(khachHang.RandomKey);
-                    khachHang.HieuLuc = true;//nếu có thời gian dùng Mail để active
-                    khachHang.VaiTro = 0;
-
-                    if (Hinh != null)
+					/*khachHang.RandomKey = MyUtil.GenerateRamdomKey();
+					khachHang.MatKhau = model.MatKhau.ToMd5Hash(khachHang.RandomKey);
+					khachHang.HieuLuc = true;//nếu có thời gian dùng Mail để active
+					khachHang.VaiTro = 0;
+*/
+					if (Hinh != null)
                     {
 
                         khachHang.MaKh.ToString();
@@ -160,7 +163,26 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 		[Authorize]
 		public IActionResult Profile()
 		{
-			return View();
+			string maKH=User.FindFirstValue("CustomerID")??"";
+			if (string.IsNullOrEmpty(maKH))
+			{
+                ModelState.AddModelError("loi", "Đăng nhập để xem thông tinh của mình");
+				return Redirect("/");
+
+            }
+			var kh = _mapper.Map<RegisterVM>(_khachHangService.GetById(maKH));
+            if (kh==null)
+            {
+                ModelState.AddModelError("loi", "Khách hàng không tồn tại trong hệ thống");
+                return Redirect("/");
+
+            }
+            if (string.IsNullOrEmpty(kh.Hinh))
+            {
+                kh.Hinh = "avatarNull.jpg";
+            }
+            //var kh = _mapper.Map<RegisterVM>();
+            return View(kh);
 		}
 		
 		[Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme,Cookies")]//nếu chưa đăng nhập chỉ đến Cookies

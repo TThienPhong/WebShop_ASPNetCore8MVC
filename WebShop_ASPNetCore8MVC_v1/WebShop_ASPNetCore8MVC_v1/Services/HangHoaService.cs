@@ -9,13 +9,13 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
     public class HangHoaService : IHangHoaService
     {
         private readonly Hshop2023Context _context;
-        private readonly ILoaiHangHoaService _loaiHangHoaService;
+        //private readonly ILoaiHangHoaService _loaiHangHoaService;
         private readonly IMapper _mapper;
 
         public HangHoaService(Hshop2023Context context,ILoaiHangHoaService loaiHangHoaService,IMapper mapper) 
         { 
             _context=context;
-            _loaiHangHoaService=loaiHangHoaService;
+            //_loaiHangHoaService=loaiHangHoaService;
             _mapper=mapper;
 
 

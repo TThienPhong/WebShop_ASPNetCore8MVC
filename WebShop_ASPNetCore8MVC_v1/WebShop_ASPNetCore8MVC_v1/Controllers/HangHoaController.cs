@@ -117,6 +117,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 var result = data.Select(p => _mapper.Map<HangHoaVM_admin>(p));
                 //var hangHoaMV = ViewBag.hangHoaMV as HangHoaVM_admin ;
                 ViewBag.isAddError = TempData["isAddError"] as bool? ?? false;
+                ViewBag.isUpdateError = TempData["isUpdateError"] as bool? ?? false;
                 ViewBag.hangHoaMV = model;
                 TempData["hangHoaList"] = result;               
                 return View();
@@ -176,8 +177,8 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 }
             }
             TempData["Message"] = $"Hàng Hoá có id:{model.MaHh}, Dữ liệu cập nhật không phù hợp, ";
-            TempData["hangHoaMV"] = model;
-            return RedirectToAction("AdminGet");
+            TempData["isUpdateError"] =true ;
+            return RedirectToAction("AdminGet", model);
         }
 
 

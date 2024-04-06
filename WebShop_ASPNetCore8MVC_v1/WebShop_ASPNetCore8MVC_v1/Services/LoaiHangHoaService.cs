@@ -10,7 +10,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebShop_ASPNetCore8MVC_v1.Services
 {
-	public class LoaiHangHoaService : ILoaiHangHoaService
+    public class LoaiHangHoaService : ILoaiHangHoaService
 	{
 		private readonly Hshop2023Context _context;
         private readonly IMapper _mapper;

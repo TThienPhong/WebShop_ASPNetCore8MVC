@@ -68,6 +68,7 @@ builder.Services.AddSingleton<IVnPayService, VnPayService>();
 
 builder.Services.AddScoped<ILoaiHangHoaService, LoaiHangHoaService>();
 builder.Services.AddScoped<IHangHoaService, HangHoaService>();
+builder.Services.AddScoped<IKhachHangService, KhachHangService>();
 
 var app = builder.Build();
 

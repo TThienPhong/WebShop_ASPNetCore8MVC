@@ -1,14 +1,85 @@
-﻿@using System.Security.Claims
-
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.RegisterVM
+@using System.Security.Claims;
 @{
+    
     ViewData["Title"] = "Profile";
+
+    var message = TempData["Message"] as string ?? "";
+    var isAddError = ViewBag.isAddError as bool? ?? false;
+
+
+    var isUpdateError = TempData["isUpdateError"] as bool? ?? false;
+   
+}
+@section Styles{
+    <style>
+        /* Để chỉnh sửa kích thước của hình ảnh */
+        .avatar {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Để căn chỉnh hình ảnh sang bên phải */
+        .profile-image {
+            float: right;
+             /* Khoảng cách giữa hình ảnh và nội dung */
+        }
+
+        /* Để xóa các đặc tính của thẻ <div> chứa hình ảnh */
+        .profile-image-container {
+            overflow: hidden; /* Đảm bảo không có phần của hình ảnh vượt ra khỏi phần tử chứa */
+            margin-left: 20px;
+        }
+    </style>
 }
 
+<div class="container-fluid py-5 mt-5">
+    <div class="container">   
+        <div class="row">
+            <div class="col-md-3 bg-primary">
+                <!-- Nội dung bên trái -->
 
-<h1>Profile</h1>
-<div class="container">
-	<h2>Welcome @Context.User.Identity.Name</h2>
-	<p> Tên Đăng Nhập:	@Context.User.FindFirstValue("CustomerID")</p>
-	<p> Email:			@Context.User.FindFirstValue(ClaimTypes.Email);</p>
-	<a asp-action="DangXuat">Đăng xuất</a>
+                <p>Bênh trái Bênh trái Bênh trái Bênh trái Bênh trái Bênh trái Bênh trái </p>
+
+            </div>
+
+            <div class="col-md-9">
+                <!-- Nội dung bên phải -->
+                <p>Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải Bênh phải  </p>
+
+            </div>
+
+            
+
+        </div>
+        <div class="row">
+
+            <div class="col-md-6">
+            <form action="/" method="post">
+            
+            </form>
+                <p> Tên:			@Context.User.FindFirstValue(ClaimTypes.Name);</p>
+                <p> Tên Đăng Nhập:	@Context.User.FindFirstValue("CustomerID")</p>
+                <p> Email:			@Context.User.FindFirstValue(ClaimTypes.Email);</p>
+                <a asp-action="DangXuat">Đăng xuất</a>
+
+
+                <p> Địa chỉ :	@Model.DiaChi</p>
+                <p> Số ĐT:			@Model.DienThoai;</p>
+            </div>
+            <div class="col-md-6">
+                <div class="profile-image-container">
+                    <div>
+                        <img src="~/Hinh/KhachHang/@Model.Hinh" alt="User Avatar" class="avatar">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+
 </div>

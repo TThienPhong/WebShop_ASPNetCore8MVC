@@ -8,7 +8,8 @@
     var isAddError = ViewBag.isAddError as bool? ?? false;
   
 
-    var isUpdateError = TempData["isUpdateError"] ?? false;
+    var isUpdateError = TempData["isUpdateError"] as bool? ?? false;
+   
     var hangHoaList = TempData["hangHoaList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin>();
 
     
@@ -313,6 +314,33 @@
             document.getElementById('Model_ChiTiet').value = ChiTiet;
         });
 </script>
+}
+@if (isUpdateError)
+{
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const addForm = document.getElementById('addForm');
+            const updateForm = document.getElementById('updateForm');
+
+            // Ẩn hoặc hiển thị form tùy thuộc vào trạng thái hiện tại của form1
+            updateForm.classList.remove('hidden');
+            addForm.classList.add('hidden');
+
+            var MaHh = @Json.Serialize(hangHoaMV.MaHh);
+            var TenHH = @Json.Serialize(hangHoaMV.TenHH);
+            var MaLoai = @Json.Serialize(hangHoaMV.MaLoai);
+            var DonGia = @Json.Serialize(hangHoaMV.DonGia);
+            var MoTaNgan = @Json.Serialize(hangHoaMV.MoTaNgan);
+            var ChiTiet = @Json.Serialize(hangHoaMV.ChiTiet);
+
+            document.getElementById('Update_MaHh').value = MaHh;
+            document.getElementById('Update_TenHH').value = TenHH;
+            document.getElementById('Update_MaLoai').value = MaLoai;
+            document.getElementById('Update_DonGia').value = DonGia;
+            document.getElementById('Update_MoTaNgan').value = MoTaNgan;
+            document.getElementById('Update_ChiTiet').value = ChiTiet;
+        });
+    </script>
 }
 
 @section Scripts {
