@@ -53,5 +53,30 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
 
 			return sb.ToString();
 		}
-	}
+        public static string DateToString(DateTime? date)
+        {
+
+            if (date.HasValue)
+            {
+                string ngay = date.Value.Day.ToString();
+                string thang = date.Value.Month.ToString();
+                string nam = date.Value.Year.ToString();
+
+                return $"{nam}-{thang}-{ngay}";
+            }
+            else
+            {
+                return "null"; // or any other default value indicating null date
+            }
+        }
+        public static string GioiTinhToString(bool gt)
+        {
+            if (!gt)
+            {
+                return "Nữ";
+            }
+            else { return "Nam"; }
+          
+        }
+    }
 }

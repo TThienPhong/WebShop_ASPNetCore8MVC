@@ -13,4 +13,9 @@
         public static string MOMO = "MoMo";
         public static string STRIPE = "Stripe";
     }
+    public class Img
+    {
+        public static string ImgAvatarNull = "avatarNull.jpg";
+        //public static string ImgProductNull = "";
+    }
 }

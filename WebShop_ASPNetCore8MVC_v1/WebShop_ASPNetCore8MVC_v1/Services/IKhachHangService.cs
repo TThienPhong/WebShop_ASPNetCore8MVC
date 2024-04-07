@@ -6,7 +6,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 {
     public interface IKhachHangService
     {
-        IEnumerable<KhachHangModel> GetAll(string? query);
+        IEnumerable<KhachHangModel> GetAll(bool?taiKhoang, string? query);
         
         KhachHangModel GetById(string MaKH);
         void Add(KhachHangModel khachHang);

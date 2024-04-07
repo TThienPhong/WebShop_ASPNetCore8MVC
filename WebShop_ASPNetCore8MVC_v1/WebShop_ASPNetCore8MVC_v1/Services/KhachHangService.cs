@@ -67,11 +67,17 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
             }
         }
 
-        public IEnumerable<KhachHangModel> GetAll(string? query)
+        public IEnumerable<KhachHangModel> GetAll(bool?taiKhoang, string? query)
         {
             #region Filtering
             var data = _context.KhachHangs.AsQueryable();
-            
+            if (taiKhoang.HasValue)
+            {
+                /*int number = -1;
+                bool isNumber = int.TryParse(query, out number);*/
+                data = data.Where(item => item.HieuLuc== taiKhoang);
+            }
+
             if (!string.IsNullOrEmpty(query))
             {
                 /*int number = -1;

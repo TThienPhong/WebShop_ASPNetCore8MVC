@@ -1,0 +1,344 @@
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.RegisterVM
+@using WebShop_ASPNetCore8MVC_v1.Helpers
+@{
+
+    ViewData["Title"] = "QL_KhachHang";
+    //var hangHoaMV = ViewBag.hangHoaMV as WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin ?? new WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin();
+
+    var message = TempData["Message"] as string ?? "";
+    //var isAddError = ViewBag.isAddError as bool? ?? false;
+
+
+    //var isUpdateError = TempData["isUpdateError"] as bool? ?? false;
+
+    var khachHangList = TempData["khachHangList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.KhachHangVM> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.KhachHangVM>();
+
+
+}
+
+@section Styles {
+    <style>
+        /* CSS để chia trang thành hai phần */
+        .split-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        .split-left {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .split-right {
+            flex: 3;
+            overflow-y: auto;
+        }
+
+        .split-handle {
+            width: 10px;
+            cursor: ew-resize;
+            background-color: #ccc;
+        }
+        /* CSS để chia trang thành hai phần */
+        .truncate-2-lines {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Số dòng tối đa */
+            -webkit-box-orient: vertical;
+        }
+    </style>
+
+}
+
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Admin_QLLoai</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+        <li class="breadcrumb-item active text-white">Quản lý Loại</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="split-container">
+            <div class="split-left">
+                <!-- Nội dung bên trái -->
+
+                <div>
+                    <th>
+                        <tr>
+                            <button id="createLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="AddForm()">Thêm mới</button>
+                        </tr>
+                        <tr>
+                            @*<div class="text-danger" asp-validation-summary="All"></div>*@
+                            <form asp-controller="KhachHang" asp-action="AdminGetAll" method="get">
+
+
+                                <div class="input-group w-100 mx-auto d-flex">
+                                    <select name="taiKhoang" id="cars">
+                                        <option value="">"Tất cả tài khoảng"</option>
+                                        <option value="true">"Tài khoảng hiệu lực"</option>
+                                        <option value="false">"Tài khoảng vô hiệu"</option>
+
+                                    </select>
+                                    <input type="search" class="p-2" placeholder="keywords" aria-describedby="searchLoaiButton" name="query" id="searchLoaiText">
+                                    <button type="submit" id="searchLoaiButton" class="input-group-text p-3 btn border-secondary py-2 px-3 text-uppercase text-primary"><i class="fa fa-search"></i></button>
+                                </div>
+                            </form>
+                        </tr>
+                    </th>
+
+                    @* -----------------From xem---------------------- *@
+                    <div class="container" id="ViewForm">
+                        <img src="~/Hinh/KhachHang/@Img.ImgAvatarNull" alt="Alternate Text" style="width: 100px; height: 100px;" id="kh_Hinh" />
+                        <div class="text-danger">@message</div>
+                        <form asp-action="Update" asp-controller="KhachHang" enctype="multipart/form-data">
+                            <div>
+
+                                <div class="text-danger" asp-validation-summary="All"></div>
+                               
+                                <div class="row">
+                                    <label asp-for="@Model.MaKh" class="form-label my-3"></label>
+                                    <input asp-for="@Model.MaKh" readonly class="form-control" id="kh_MaKh">
+                                    <span asp-validation-for="@Model.MaKh" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <label asp-for="@Model.HoTen" class="form-label my-3"></label>
+                                    <input asp-for="@Model.HoTen" class="form-control" id="kh_HoTen">
+                                    <span asp-validation-for="@Model.HoTen" class="text-danger"></span>
+                                </div>
+                                
+                                <div class="row">
+                                    <label class="form-label my-3" asp-for="@Model.GioiTinh"></label>
+                                    <div class="form-control">
+                                        <input asp-for="@Model.GioiTinh" type="radio" value="True" id="kh_GioiTinhNam">Nam
+                                        <span>  </span>
+                                        <input asp-for="@Model.GioiTinh" type="radio" value="False" id="kh_GioiTinhNu">Nữ
+                                    </div>
+
+                                    <span asp-validation-for="@Model.GioiTinh" class="text-danger"></span>
+                                </div>
+
+
+                                <div class="row">
+                                    <label asp-for="@Model.Email" class="form-label my-3"></label>
+                                    <input asp-for="@Model.Email" class="form-control" id="kh_Email">
+                                    <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.DienThoai" class="form-label my-3"></label>
+                                    <input asp-for="@Model.DienThoai" class="form-control" id="kh_DienThoai">
+                                    <span asp-validation-for="@Model.DienThoai" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.DiaChi" class="form-label my-3"></label>
+                                    <input asp-for="@Model.DiaChi" class="form-control" id="kh_DiaChi">
+                                    <span asp-validation-for="@Model.DiaChi" class="text-danger"></span>
+                                </div>
+                                <div class="row">
+                                    <label asp-for="@Model.NgaySinh" class="form-label my-3"></label>
+                                    <input asp-for="@Model.NgaySinh" class="form-control" id="kh_NgaySinh">
+                                    <span asp-validation-for="@Model.NgaySinh" class="text-danger"></span>
+                                </div>
+
+
+
+                               
+                            </div>
+                        </form>
+
+
+                        <div class="row hidden" id="bt_VoHieu">
+                            <span> &nbsp;</span>
+                            <a asp-controller="KhachHang" asp-action="AdminVoHieu" type="button" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Vô hiệu</a>
+
+                        </div>
+                        <div class="row hidden" id="bt_KichHoat">
+                            <span> &nbsp;</span>
+
+                            <a asp-controller="KhachHang" asp-action="AdminKichHoat" type="button"  class="btn border-secondary py-1 px-2 text-uppercase text-primary">Kích hoạt</a>
+
+                        </div>
+                    </div>
+
+
+                    @* -----------------End From xem---------------------- *@
+
+
+                  
+                </div>
+
+            </div>
+
+
+
+            <div class="split-handle"></div>
+            <div class="split-right">
+                <!-- Nội dung bên phải -->
+                <!----------------------- Thông báo -->
+                <div id="successMessage" class="alert alert-success" style="display: none;">
+                    <h3 class="text-danger">@message</h3>
+                    <button type="button" class="close" onclick="closeMessage()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!----------------------- end Thông báo -->
+
+                <div class="table-responsive">
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Hình</th>
+                                <th scope="col">Họ tên</th>
+                                <th scope="col">Mã KH</th>
+                               
+                               
+                                <th scope="col">Giới tính</th>
+
+                                <th scope="col">Email</th>
+                                <th scope="col">Hiệu lực</th>
+                               
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in khachHangList)
+                            {
+                                <tr>
+                                    <td>
+                                        <img class="mb-0 mt-4 truncate-2-lines" src="~/Hinh/KhachHang/@item.Hinh" alt="Hình khach hang @item.MaKh" style="width: 50px; height: 50px;">
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.HoTen</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.MaKh</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@MyUtil.GioiTinhToString(item.GioiTinh)</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.Email</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.HieuLuc</p>
+                                    </td>
+
+                                    <td>
+                                        <button type="button" id="updateHangHoa_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="ViewForm('@item.Hinh','@item.MaKh', '@item.HoTen', '@MyUtil.GioiTinhToString(item.GioiTinh)','@item.Email', '@item.DiaChi','@item.DienThoai','@MyUtil.DateToString(item.NgaySinh)','@item.HieuLuc')">Xem</button>
+                                    </td>
+                                   
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+<!-- Cart Page End -->
+
+
+@section Scripts {
+    <script>
+        // JavaScript để cho phép kéo thu phóng
+        const handle = document.querySelector('.split-handle');
+        const leftPane = document.querySelector('.split-left');
+        const rightPane = document.querySelector('.split-right');
+        let isDragging = false;
+
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const xPos = e.clientX;
+            const containerRect = document.querySelector('.split-container').getBoundingClientRect();
+            const leftWidth = xPos - containerRect.left;
+
+            leftPane.style.width = leftWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        //---------------------------------------------
+        const btVoHieu = document.getElementById('bt_VoHieu');
+        const btKichHoat = document.getElementById('bt_KichHoat');
+       
+        //-----
+        function ViewForm(Hinh, MaKh, HoTen, GioiTinh, Email, DienThoai, DiaChi, NgaySinh, HieuLuc) {
+            // Cập nhật thông tin vào các trường của biểu mẫu
+            document.getElementById('kh_Hinh').src = `/Hinh/KhachHang/${Hinh}`;
+            document.getElementById('kh_MaKh').value = MaKh;
+            document.getElementById('kh_HoTen').value = HoTen;
+            document.getElementById('kh_Email').value = Email;
+            document.getElementById('kh_DienThoai').value = DienThoai;
+            document.getElementById('kh_DiaChi').value = DiaChi;
+            document.getElementById('kh_NgaySinh').value = NgaySinh;
+            console.log("src hình", document.getElementById('kh_Hinh').src)
+           
+            if (GioiTinh == "Nam") {
+                document.getElementById('kh_GioiTinhNam').checked = true;
+            }
+            else {
+                   document.getElementById('kh_GioiTinhNu').checked = true;
+            }
+            
+            if (HieuLuc==="True") {
+                console.log("hieu luc true: ", HieuLuc)
+                btVoHieu.classList.remove('hidden');
+                btKichHoat.classList.add('hidden');
+            }else{
+                console.log("hieu luc false: ", HieuLuc)
+                btVoHieu.classList.add('hidden');
+                btKichHoat.classList.remove('hidden');
+            }
+
+            var linkVoHieu = document.querySelector('#bt_VoHieu a');
+            var linkKichHoat = document.querySelector('#bt_KichHoat a');
+            linkVoHieu.href = `/KhachHang/AdminVoHieu?MaKh=${MaKh}`;
+            linkKichHoat.href = `/KhachHang/AdminKichHoat?MaKh=${MaKh}`;
+            
+          
+        }
+
+        //----------------Hiển thị thông báo
+
+        if (@message.Length > 0) {
+            showSuccessMessage();
+        }
+        else {
+            closeMessage();
+        }
+        function showSuccessMessage() {
+            document.getElementById("successMessage").style.display = "block";
+        }
+
+        function closeMessage() {
+            document.getElementById("successMessage").style.display = "none";
+        }
+
+
+    </script>
+}

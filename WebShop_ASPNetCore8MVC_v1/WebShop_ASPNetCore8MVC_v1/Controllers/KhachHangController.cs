@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using WebShop_ASPNetCore8MVC_v1.Services;
 using WebShop_ASPNetCore8MVC_v1.Models;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace WebShop_ASPNetCore8MVC_v1.Controllers
@@ -61,7 +63,7 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
                 }
                 try
                 {
-                    var khachHang = _mapper.Map<KhachHang>(model);
+                    var khachHang = _mapper.Map<KhachHangModel>(model);
 					/*khachHang.RandomKey = MyUtil.GenerateRamdomKey();
 					khachHang.MatKhau = model.MatKhau.ToMd5Hash(khachHang.RandomKey);
 					khachHang.HieuLuc = true;//nếu có thời gian dùng Mail để active
@@ -70,12 +72,17 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 					if (Hinh != null)
                     {
 
-                        khachHang.MaKh.ToString();
+                        //khachHang.MaKh.ToString();
                         khachHang.Hinh = MyUtil.UploadHinh(Hinh, "KhachHang");
                     }
+                    else
+                    {
+                        khachHang.Hinh=Img.ImgAvatarNull;
+                    }
 
-                    db.Add(khachHang);
-                    db.SaveChanges();
+                    /* db.Add(khachHang);
+                     db.SaveChanges();*/
+                    _khachHangService.Add(khachHang);
                     return RedirectToAction("Index", "HangHoa");
                 }
                 catch (Exception ex)
@@ -259,5 +266,82 @@ namespace WebShop_ASPNetCore8MVC_v1.Controllers
 			return Redirect("/");
 		}
 
-	}
+
+        #region AdminQLKhachHang
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        [HttpGet]
+        public IActionResult AdminGetAll(bool? taiKhoang, string? query)
+        {
+
+
+            try
+            {
+                IEnumerable<KhachHangModel> data = _khachHangService.GetAll(taiKhoang, query);
+                var result = data.Select(p => _mapper.Map<KhachHangVM>(p));
+                //var hangHoaMV = ViewBag.hangHoaMV as HangHoaVM_admin ;
+               /* ViewBag.isAddError = TempData["isAddError"] as bool? ?? false;
+                ViewBag.isUpdateError = TempData["isUpdateError"] as bool? ?? false;
+                ViewBag.hangHoaMV = model;*/
+                TempData["khachHangList"] = result;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ModelState.AddModelError("loi", "Không thể gọi danh sách KhachHang ");
+                TempData["Message"] = $"Không tể gọi danh sách KhachHang";
+                return View();
+            }
+        }
+
+
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        [HttpGet]
+        public IActionResult AdminVoHieu(string MaKH)
+        {
+           
+            try 
+            {
+                var kh = _khachHangService.GetById(MaKH);
+                kh.HieuLuc = false;
+                _khachHangService.Update(kh);
+                TempData["Message"] = $"Đã vô hiệu tài khoảng: {MaKH}";
+                //var query = MaKH;
+                return RedirectToAction("AdminGetAll", new { query = MaKH });
+            }
+            catch
+            {
+                //var query = MaKH;
+                TempData["Message"] = $"Không thể vô hiệu tài khoảng: {MaKH}";
+                return RedirectToAction("AdminGetAll", new { query = MaKH });
+            }
+
+        }
+        [Authorize(AuthenticationSchemes = "AdminCookieAuthenticationScheme")]
+        [HttpGet]
+        public IActionResult AdminKichHoat(string MaKH)
+        {
+
+            try
+            {
+                var kh = _khachHangService.GetById(MaKH);
+                kh.HieuLuc = true;
+                _khachHangService.Update(kh);
+                TempData["Message"] = $"Đã Kích hoạt tài khoảng: {MaKH}";
+                var query = MaKH;
+                return RedirectToAction("AdminGetAll", new { query = MaKH });
+            }
+            catch
+            {
+                TempData["Message"] = $"Không thể Kích hoạt tài khoảng: {MaKH}";
+                var query = MaKH;
+                
+                return RedirectToAction("AdminGetAll", new { query = MaKH });
+            }
+
+        }
+
+        #endregion
+
+    }
 }

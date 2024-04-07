@@ -24,9 +24,16 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
              .AfterMap((src, dest) => dest.MatKhau = src.MatKhau.ToMd5Hash(dest.RandomKey));
 
 
-            CreateMap<KhachHangModel, RegisterVM>()
-             .ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src) => "12345"));
-            
+            CreateMap<KhachHangModel, KhachHangVM>();//Admin xem, vô hiệu/Kích hoạt tài khoảng
+             //.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src) => "12345"));
+
+           /* CreateMap<KhachHangVM, KhachHangModel>()
+           
+            *//*.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src,dest) => src.MatKhau.ToMd5Hash(dest.RandomKey)))*//*
+            .ForMember(dest => dest.HieuLuc, opt => opt.MapFrom(src => src.HieuLuc))
+            .ForMember(dest => dest.VaiTro, opt => opt.MapFrom(src => 0))
+            .AfterMap((src, dest) => dest.MatKhau = src.MatKhau.ToMd5Hash(dest.RandomKey));*/
+
 
 
             //.ForMember(kh => kh.HoTen, option => option.MapFrom(RegisterVM => RegisterVM.HoTen))
