@@ -74,12 +74,44 @@ namespace WebShop_ASPNetCore8MVC_v1.Services
 
         public HoaDonModel GetById(int maHD)
         {
-            throw new NotImplementedException();
+            var hd = _context.HoaDons
+             
+               .SingleOrDefault(p => p.MaHd == maHD);
+            if (hd != null)
+            {
+                return _mapper.Map<HoaDonModel>(hd);
+
+            }
+            return null;
         }
 
         public void Update(HoaDonModel hoaDon)
         {
-            throw new NotImplementedException();
+            if (hoaDon == null)
+            {
+                throw new ArgumentNullException(nameof(hoaDon), "cannot be null.");
+                return;
+            }
+
+            var data = _context.HoaDons.SingleOrDefault(p => p.MaHd == hoaDon.MaHd);
+            if (data != null)
+            {
+                try
+                {
+
+                    _mapper.Map(hoaDon, data);
+
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException("Không thể cập nhật HoaDon", ex);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Loai not found.", nameof(hoaDon));
+            }
         }
     }
 }

@@ -1,7 +1,12 @@
 ﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.TrangThaiVM>
+@{
+    var selected = ViewBag.SelectedTrangThai as int? ?? -5;
+}
 
 @foreach (var item in Model)
 {
-    <option value="@item.MaTrangThai">"@item.MaTrangThai"-"@item.TenTrangThai"</option>
+    <option value="@item.MaTrangThai" selected="@((selected == item.MaTrangThai) ? "selected" : null)">
+        @item.MaTrangThai - @item.TenTrangThai
+    </option>
 }
 

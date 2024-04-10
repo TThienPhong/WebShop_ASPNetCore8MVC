@@ -1,0 +1,326 @@
+﻿@model WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM
+@{
+    ViewData["Title"] = "AdminGetAll";
+    var message = TempData["Message"] as string ?? "";
+    //var isAddError = ViewBag.isAddError as bool? ?? false;
+
+
+    //var isUpdateError = TempData["isUpdateError"] as bool? ?? false;
+    var donHang = TempData["DonHang"] as WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM ?? new WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM() ;
+    var donHangList = TempData["DonHangList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM>();
+}
+
+@section Styles {
+    <style>
+        /* CSS để chia trang thành hai phần */
+        .split-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        .split-left {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .split-right {
+            flex: 3;
+            overflow-y: auto;
+        }
+
+        .split-handle {
+            width: 10px;
+            cursor: ew-resize;
+            background-color: #ccc;
+        }
+        /* CSS để chia trang thành hai phần */
+        .truncate-2-lines {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Số dòng tối đa */
+            -webkit-box-orient: vertical;
+        }
+    </style>
+}
+
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Admin_QLLoai</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+        <li class="breadcrumb-item active text-white">Đơn hàng</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="split-container">
+            <div class="split-left">
+                <!-- Nội dung bên trái -->
+
+                <div>
+                    <th>
+                        <tr>
+                            
+                        </tr>
+                        <tr>
+                            @*<div class="text-danger" asp-validation-summary="All"></div>*@
+                            <form asp-controller="DonHang" asp-action="AdminGetAll" method="get">
+                                <div class="input-group w-100 mx-auto d-flex">
+                                    <select name="maTrangThai" id="trangThai">
+                                        <option value="">Tất Cả Trạng Thái</option>
+                                        @await Component.InvokeAsync("SelectTrangThai")
+                                    </select>
+                                    <input type="search" class="p-2" placeholder="Nhập mã hoá đơn" aria-describedby="searchMaHoaDon" name="maHD" id="searchMaHoaDon">
+                                    <input type="search" class="p-2" placeholder="Nhập mã khách hàng" aria-describedby="searchMaKhachHang" name="maKH" id="searchMaKhachHang">
+                                    <button type="submit" id="searchButton" class="input-group-text p-3 btn border-secondary py-2 px-3 text-uppercase text-primary"><i class="fa fa-search"></i></button>
+                                </div>
+                            </form>
+                        </tr>
+                    </th>
+
+                    @* -----------------From xem---------------------- *@
+                    <div class="container py-5" id="updateForm">
+                        <form asp-action="AdminUpdateTrangThai" asp-controller="DonHang" method="post" >
+
+                            <div>
+                                <h1>Đơn hàng</h1>
+                                
+                                <div class="row">
+                                    <label class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@donHang.MaHd" name="maHD" readonly class="form-control" id="dh_MaHd">
+                                </div>
+                                <div class="row">
+                                    <label class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@donHang.MaKh" readonly class="form-control" id="dh_MaKh">
+                                </div>
+                                <div class="row">
+                                    <label class="form-label my-3"></label><sup>*</sup>
+                                    <input asp-for="@donHang.NgayDat" readonly class="form-control" id="dh_NgayDat">
+                                </div>
+                              
+                                <div class="row">
+                                    <label  class="form-label my-3"></label><sup>*</sup>
+                                    <select name="maTrangThai"  asp-for="@donHang.MaTrangThai" id="dh_MaTrangThai" class="form-control">
+                                        @await Component.InvokeAsync("SelectTrangThai")
+                                    </select>
+                                    
+                                </div>
+                               
+                              
+                               
+                                <div class="row">
+                                    <button type="submit" class="btn border-secondary py-1 px-2 text-uppercase text-primary">Đỗi trạng thái</button>
+
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+
+                    @* -----------------End From xem---------------------- *@
+
+
+
+                </div>
+
+            </div>
+
+
+
+            <div class="split-handle"></div>
+            <div class="split-right">
+                <!-- Nội dung bên phải -->
+                <!----------------------- Thông báo -->
+                <div id="successMessage" class="alert alert-success" style="display: none;">
+                    <h3 class="text-danger">@message</h3>
+                    <button type="button" class="close" onclick="closeMessage()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!----------------------- end Thông báo -->
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Mã HD</th>
+                                <th scope="col">Mã KH</th>
+                                <th scope="col">Cách vận chuyển</th>
+
+
+                                <th scope="col">Trạng Thái</th>
+
+
+                                <th scope="col">NgayDat</th>
+                                <th scope="col">Phí Vận Chuyển</th>
+                                <th scope="col">Tổng Tiền</th>
+                                <th scope="col">DT</th>
+                                <th scope="col">Địa chỉ</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in donHangList)
+                            {
+                                <tr class="table-dark">
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.MaHd</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.MaKh</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.CachVanChuyen</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.TrangThai.TenTrangThai</p>
+                                       
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.NgayDat</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.PhiVanChuyen</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@(item.ChiTietHds.Sum(ct => ct.SoLuong * ct.DonGia) + item.PhiVanChuyen)</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.DienThoai</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.DiaChi</p>
+                                    </td>
+                                    <td>
+                                        <button class="btn border-secondary py-1 px-1 text-uppercase text-primary" onclick="UpdateForm('@item.MaHd','@item.MaKh','@item.NgayDat.ToString("yyyy-MM-dd HH:mm:ss")','@item.MaTrangThai')">Sửa trạng thái</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6">
+                                        <!-- Mở một hàng mới để chứa bảng danh sách sản phẩm -->
+                                        <table class="table">
+                                            <!-- Bảng danh sách sản phẩm -->
+
+                                            <tbody>
+                                            <td>
+                                                    @foreach (var sp in item.ChiTietHds)
+                                                    {
+                                                <tr>
+                                                    <td>
+                                                        <img src="~/Hinh/HangHoa/@sp.Hinh" alt="Alternate Text" style="width: 50px; height: 50px;" />
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4">@sp.MaHh</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4">@sp.TenHH</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4">@sp.DonGia</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4">@sp.SoLuong</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4">Tổng: @(sp.SoLuong * sp.DonGia)</p>
+                                                    </td>
+
+                                                </tr>
+
+                                                    }
+                                            </td>
+                                            </tbody>
+
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+<!-- Cart Page End -->
+@section Scripts {
+    <script>
+        // JavaScript để cho phép kéo thu phóng
+        const handle = document.querySelector('.split-handle');
+        const leftPane = document.querySelector('.split-left');
+        const rightPane = document.querySelector('.split-right');
+        let isDragging = false;
+
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const xPos = e.clientX;
+            const containerRect = document.querySelector('.split-container').getBoundingClientRect();
+            const leftWidth = xPos - containerRect.left;
+
+            leftPane.style.width = leftWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        //---------------------------------------------
+        const btVoHieu = document.getElementById('bt_VoHieu');
+        const btKichHoat = document.getElementById('bt_KichHoat');
+
+        //-----
+        function UpdateForm(MaHd, MaKh, NgayDat, MaTrangThai) {
+            // Cập nhật thông tin vào các trường của biểu mẫu
+            document.getElementById('dh_MaHd').value = MaHd;
+            document.getElementById('dh_MaKh').value = MaKh;
+            document.getElementById('dh_NgayDat').value = NgayDat;
+            document.getElementById('dh_MaTrangThai').value = MaTrangThai;       
+
+        }
+
+        //----------------Hiển thị thông báo
+
+        if (@message.Length > 0) {
+            showSuccessMessage();
+        }
+        else {
+            closeMessage();
+        }
+        function showSuccessMessage() {
+            document.getElementById("successMessage").style.display = "block";
+        }
+
+        function closeMessage() {
+            document.getElementById("successMessage").style.display = "none";
+        }
+
+
+    </script>
+}
+
+
+

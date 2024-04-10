@@ -15,10 +15,11 @@ namespace WebShop_ASPNetCore8MVC_v1.ViewComponents
             _trangThaiService = trangThaiService;
             _mapper=mapper;
         }
-        public IViewComponentResult Invoke()
+        public IViewComponentResult Invoke(int? selectedValue = null)
         {
             /*var cart = HttpContext.Session.Get<List<CartItem>>(MySetting.CART_KEY) ?? new List<CartItem>();*/
             var trangThaiVM = _trangThaiService.GetAll().Select(l=>_mapper.Map<TrangThaiVM>(l));
+            ViewBag.SelectedTrangThai = selectedValue;
             return View("SelectTrangThai", trangThaiVM);
         }
     }
