@@ -1,0 +1,314 @@
+﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM>
+@{
+    ViewData["Title"] = "CustomerGetAll";
+    //var hangHoaMV = ViewBag.hangHoaMV as WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin ?? new WebShop_ASPNetCore8MVC_v1.ViewModels.HangHoaVM_admin();
+
+    var message = TempData["Message"] as string ?? "";
+    //var isAddError = ViewBag.isAddError as bool? ?? false;
+
+
+    //var isUpdateError = TempData["isUpdateError"] as bool? ?? false;
+
+    var donHangList = TempData["DonHangList"] as IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM> ?? new List<WebShop_ASPNetCore8MVC_v1.ViewModels.HoaDonVM>();
+}
+
+@section Styles {
+    <style>
+        /* CSS để chia trang thành hai phần */
+        .split-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
+        .split-left {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .split-right {
+            flex: 3;
+            overflow-y: auto;
+        }
+
+        .split-handle {
+            width: 10px;
+            cursor: ew-resize;
+            background-color: #ccc;
+        }
+        /* CSS để chia trang thành hai phần */
+        .truncate-2-lines {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Số dòng tối đa */
+            -webkit-box-orient: vertical;
+        }
+    </style>
+
+}
+
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Admin_QLLoai</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+        <li class="breadcrumb-item active text-white">Đơn hàng</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="split-container">
+            <div class="split-left">
+                <!-- Nội dung bên trái -->
+
+                <div>
+                    <th>
+                        <tr>
+                            <button id="createLoai_bt" class="btn border-secondary py-2 px-3 text-uppercase text-primary" onclick="AddForm()">Thêm mới</button>
+                        </tr>
+                        <tr>
+                            @*<div class="text-danger" asp-validation-summary="All"></div>*@
+                            <form asp-controller="DonHang" asp-action="CustomerGetAll" method="get">
+
+
+                                <div class="input-group w-100 mx-auto d-flex">
+                                    <select name="maTrangThai" id="cars">
+                                        <option value="">"Tât Cả"</option>
+                                        @await Component.InvokeAsync("SelectTrangThai")
+
+                                    </select>
+                                    <input type="search" class="p-2" placeholder="keywords" aria-describedby="searchLoaiButton" name="query" id="searchLoaiText">
+                                    <button type="submit" id="searchLoaiButton" class="input-group-text p-3 btn border-secondary py-2 px-3 text-uppercase text-primary"><i class="fa fa-search"></i></button>
+                                </div>
+                            </form>
+                        </tr>
+                    </th>
+
+                    @* -----------------From xem---------------------- *@
+                  
+
+
+                    @* -----------------End From xem---------------------- *@
+
+
+
+                </div>
+
+            </div>
+
+
+
+            <div class="split-handle"></div>
+            <div class="split-right">
+                <!-- Nội dung bên phải -->
+                <!----------------------- Thông báo -->
+                <div id="successMessage" class="alert alert-success" style="display: none;">
+                    <h3 class="text-danger">@message</h3>
+                    <button type="button" class="close" onclick="closeMessage()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!----------------------- end Thông báo -->
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Mã HD</th>
+                                <th scope="col">Mã KH</th>
+                                <th scope="col">Cách vận chuyển</th>
+
+
+                                <th scope="col">Trạng Thái</th>
+
+
+                                <th scope="col">NgayDat</th>
+                                <th scope="col">Phí Vận Chuyển</th>
+                                <th scope="col">Tổng Tiền</th>
+                                <th scope="col">DT</th>
+                                <th scope="col">Địa chỉ</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in donHangList)
+                            {
+                                <tr class="table-dark">
+                                    
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.MaHd</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.MaKh</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.CachVanChuyen</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.TrangThai.TenTrangThai</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.NgayDat</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.PhiVanChuyen</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@(item.ChiTietHds.Sum(ct => ct.SoLuong * ct.DonGia) + item.PhiVanChuyen)</p>
+                                    </td>
+
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.DienThoai</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 mt-4">@item.DiaChi</p>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="6">
+                                        <!-- Mở một hàng mới để chứa bảng danh sách sản phẩm -->
+                                        <table class="table">
+                                            <!-- Bảng danh sách sản phẩm -->
+                                           
+                                            <tbody>
+                                                @foreach (var sp in item.ChiTietHds)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <img src="~/Hinh/HangHoa/@sp.Hinh" alt="Alternate Text" style="width: 50px; height: 50px;" />
+                                                        </td>
+                                                        <td>
+                                                            <p class="mb-0 mt-4">@sp.MaHh</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="mb-0 mt-4">@sp.TenHH</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="mb-0 mt-4">@sp.DonGia</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="mb-0 mt-4">@sp.SoLuong</p>
+                                                        </td>
+                                                        <td>
+                                                            <p class="mb-0 mt-4">Tổng: @(sp.SoLuong*sp.DonGia)</p>
+                                                        </td>
+                                                       
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+<!-- Cart Page End -->
+@section Scripts {
+    <script>
+        // JavaScript để cho phép kéo thu phóng
+        const handle = document.querySelector('.split-handle');
+        const leftPane = document.querySelector('.split-left');
+        const rightPane = document.querySelector('.split-right');
+        let isDragging = false;
+
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const xPos = e.clientX;
+            const containerRect = document.querySelector('.split-container').getBoundingClientRect();
+            const leftWidth = xPos - containerRect.left;
+
+            leftPane.style.width = leftWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        //---------------------------------------------
+        const btVoHieu = document.getElementById('bt_VoHieu');
+        const btKichHoat = document.getElementById('bt_KichHoat');
+
+        //-----
+        function ViewForm(Hinh, MaKh, HoTen, GioiTinh, Email, DienThoai, DiaChi, NgaySinh, HieuLuc) {
+            // Cập nhật thông tin vào các trường của biểu mẫu
+            document.getElementById('kh_Hinh').src = `/Hinh/KhachHang/${Hinh}`;
+            document.getElementById('kh_MaKh').value = MaKh;
+            document.getElementById('kh_HoTen').value = HoTen;
+            document.getElementById('kh_Email').value = Email;
+            document.getElementById('kh_DienThoai').value = DienThoai;
+            document.getElementById('kh_DiaChi').value = DiaChi;
+            document.getElementById('kh_NgaySinh').value = NgaySinh;
+            console.log("src hình", document.getElementById('kh_Hinh').src)
+
+            if (GioiTinh == "Nam") {
+                document.getElementById('kh_GioiTinhNam').checked = true;
+            }
+            else {
+                document.getElementById('kh_GioiTinhNu').checked = true;
+            }
+
+            if (HieuLuc === "True") {
+                console.log("hieu luc true: ", HieuLuc)
+                btVoHieu.classList.remove('hidden');
+                btKichHoat.classList.add('hidden');
+            } else {
+                console.log("hieu luc false: ", HieuLuc)
+                btVoHieu.classList.add('hidden');
+                btKichHoat.classList.remove('hidden');
+            }
+
+            var linkVoHieu = document.querySelector('#bt_VoHieu a');
+            var linkKichHoat = document.querySelector('#bt_KichHoat a');
+            linkVoHieu.href = `/KhachHang/AdminVoHieu?MaKh=${MaKh}`;
+            linkKichHoat.href = `/KhachHang/AdminKichHoat?MaKh=${MaKh}`;
+
+
+        }
+
+        //----------------Hiển thị thông báo
+
+        if (@message.Length > 0) {
+            showSuccessMessage();
+        }
+        else {
+            closeMessage();
+        }
+        function showSuccessMessage() {
+            document.getElementById("successMessage").style.display = "block";
+        }
+
+        function closeMessage() {
+            document.getElementById("successMessage").style.display = "none";
+        }
+
+
+    </script>
+}
+
+

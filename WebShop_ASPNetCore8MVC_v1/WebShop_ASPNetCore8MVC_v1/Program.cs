@@ -69,7 +69,8 @@ builder.Services.AddSingleton<IVnPayService, VnPayService>();
 builder.Services.AddScoped<ILoaiHangHoaService, LoaiHangHoaService>();
 builder.Services.AddScoped<IHangHoaService, HangHoaService>();
 builder.Services.AddScoped<IKhachHangService, KhachHangService>();
-
+builder.Services.AddScoped<ITrangThaiService, TrangThaiService>();
+builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

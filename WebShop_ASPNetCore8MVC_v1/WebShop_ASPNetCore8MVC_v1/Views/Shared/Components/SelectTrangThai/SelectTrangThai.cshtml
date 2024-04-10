@@ -1,0 +1,7 @@
+﻿@model IEnumerable<WebShop_ASPNetCore8MVC_v1.ViewModels.TrangThaiVM>
+
+@foreach (var item in Model)
+{
+    <option value="@item.MaTrangThai">"@item.MaTrangThai"-"@item.TenTrangThai"</option>
+}
+

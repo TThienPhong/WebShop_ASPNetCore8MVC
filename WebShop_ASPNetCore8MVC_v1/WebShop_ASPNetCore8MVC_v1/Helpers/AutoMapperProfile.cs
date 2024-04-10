@@ -23,13 +23,14 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
              .ForMember(dest => dest.VaiTro, opt => opt.MapFrom(src => 0))
              .AfterMap((src, dest) => dest.MatKhau = src.MatKhau.ToMd5Hash(dest.RandomKey));
 
+            CreateMap<KhachHangModel, RegisterVM>();
 
             CreateMap<KhachHangModel, KhachHangVM>();//Admin xem, vô hiệu/Kích hoạt tài khoảng
-             //.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src) => "12345"));
+                                                     //.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src) => "12345"));
 
-           /* CreateMap<KhachHangVM, KhachHangModel>()
-           
-            *//*.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src,dest) => src.MatKhau.ToMd5Hash(dest.RandomKey)))*//*
+            CreateMap<KhachHangVM, KhachHangModel>();
+
+            /*.ForMember(dest => dest.MatKhau, opt => opt.MapFrom((src,dest) => src.MatKhau.ToMd5Hash(dest.RandomKey)))*//*
             .ForMember(dest => dest.HieuLuc, opt => opt.MapFrom(src => src.HieuLuc))
             .ForMember(dest => dest.VaiTro, opt => opt.MapFrom(src => 0))
             .AfterMap((src, dest) => dest.MatKhau = src.MatKhau.ToMd5Hash(dest.RandomKey));*/
@@ -74,6 +75,23 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
                     MaLoai = src.MaLoai,
                     TenLoai = src.TenLoai??""
                 }));
+            //---Don Hang
+            CreateMap<ChiTietHDModel, ChiTietHDVM>()
+                .ForMember(dest => dest.TenHH, opt => opt.MapFrom(src => src.HangHoa.TenHH))
+                .ForMember(dest => dest.Hinh, opt => opt.MapFrom(src => src.HangHoa.Hinh));
+
+            CreateMap<ChiTietHDVM, ChiTietHDModel>();
+                
+
+            CreateMap<TrangThaiModel, TrangThaiVM>();
+
+            CreateMap<TrangThaiVM, TrangThaiModel>();
+            CreateMap<HoaDonModel, HoaDonVM>()
+                 .ForMember(dest => dest.KhachHang, opt => opt.MapFrom(src => src.KhachHang))
+                 .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => src.TrangThai))
+                 .ForMember(dest => dest.ChiTietHds, opt => opt.MapFrom(src => src.ChiTietHds));
+            CreateMap<HoaDonVM, HoaDonModel>();
+                
             //---------------------------------------------------------
 
             CreateMap<KhachHangModel, KhachHang>();
@@ -92,7 +110,21 @@ namespace WebShop_ASPNetCore8MVC_v1.Helpers
                .ForMember(dest => dest.ChiTiet, opt => opt.MapFrom(src => src.MoTa ?? ""))
                .ForMember(dest => dest.MoTaNgan, opt => opt.MapFrom(src => src.MoTaDonVi ?? ""))
                .ForMember(dest => dest.LoaiHH, opt => opt.MapFrom(src => src.MaLoaiNavigation));
-              
+
+
+            CreateMap<ChiTietHDModel, ChiTietHd>();
+
+            CreateMap<ChiTietHd, ChiTietHDModel>()
+                 .ForMember(dest => dest.HangHoa, opt => opt.MapFrom(src => src.MaHhNavigation));
+
+            CreateMap<TrangThai, TrangThaiModel>();
+            CreateMap<TrangThaiModel, TrangThai>();
+
+            CreateMap<HoaDon, HoaDonModel>()
+                .ForMember(dest => dest.TrangThai, opt => opt.MapFrom(src => src.MaTrangThaiNavigation))
+                .ForMember(dest => dest.ChiTietHds, opt => opt.MapFrom(src => src.ChiTietHds));
+
+            CreateMap<HoaDonModel, HoaDon>();
         }
 
     }
